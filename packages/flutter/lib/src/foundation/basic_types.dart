@@ -151,7 +151,7 @@ class BitField<T extends dynamic> {
 ///
 ///  * It requires more memory than a non-caching iterator.
 ///
-///  * the [length] and [toList] properties immediately precache the
+///  * The [length] and [toList] properties immediately pre-cache the
 ///    entire list. Using these fields therefore loses the laziness of
 ///    the iterable. However, it still gets cached.
 ///

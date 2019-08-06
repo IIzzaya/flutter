@@ -98,6 +98,9 @@ typedef GestureForceInterpolation = double Function(double pressureMin, double p
 /// force touch functionality, with the exception of the iPhone XR. In addition,
 /// a small handful of Android devices have this functionality as well.
 ///
+/// Devices with faux screen pressure sensors like the Pixel 2 and 3 will not
+/// send any force press related callbacks.
+///
 /// Reported pressure will always be in the range 0.0 to 1.0, where 1.0 is
 /// maximum pressure and 0.0 is minimum pressure. If using a custom
 /// [interpolation] callback, the pressure reported will correspond to that
@@ -113,6 +116,8 @@ class ForcePressGestureRecognizer extends OneSequenceGestureRecognizer {
   /// The [interpolation] callback must always return a value in the range 0.0
   /// to 1.0 for values of `pressure` that are between `pressureMin` and
   /// `pressureMax`.
+  ///
+  /// {@macro flutter.gestures.gestureRecognizer.kind}
   ForcePressGestureRecognizer({
     this.startPressure = 0.4,
     this.peakPressure = 0.85,

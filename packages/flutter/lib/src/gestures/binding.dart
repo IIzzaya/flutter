@@ -169,7 +169,7 @@ mixin GestureBinding on BindingBase implements HitTestable, HitTestDispatcher, H
             information.writeln('  $event');
             information.writeln('Target:');
             information.write('  ${entry.target}');
-          }
+          },
         ));
       }
     }
@@ -205,7 +205,7 @@ class FlutterErrorDetailsForPointerEventDispatcher extends FlutterErrorDetails {
     this.event,
     this.hitTestEntry,
     InformationCollector informationCollector,
-    bool silent = false
+    bool silent = false,
   }) : super(
     exception: exception,
     stack: stack,
@@ -219,7 +219,8 @@ class FlutterErrorDetailsForPointerEventDispatcher extends FlutterErrorDetails {
   final PointerEvent event;
 
   /// The hit test result entry for the object whose handleEvent method threw
-  /// the exception.
+  /// the exception. May be null if no hit test entry is associated with the
+  /// event (e.g. hover and pointer add/remove events).
   ///
   /// The target object itself is given by the [HitTestEntry.target] property of
   /// the hitTestEntry object.

@@ -53,7 +53,7 @@ const int kForwardMouseButton = 0x10;
 
 /// The bit of [PointerEvent.buttons] that corresponds to the nth mouse button.
 ///
-/// The number argument can be at most 62.
+/// The `number` argument can be at most 62.
 ///
 /// See [kPrimaryMouseButton], [kSecondaryMouseButton], [kMiddleMouseButton],
 /// [kBackMouseButton], and [kForwardMouseButton] for semantic names for some
@@ -62,7 +62,7 @@ int nthMouseButton(int number) => (kPrimaryMouseButton << (number - 1)) & kMaxUn
 
 /// The bit of [PointerEvent.buttons] that corresponds to the nth stylus button.
 ///
-/// The number argument can be at most 62.
+/// The `number` argument can be at most 62.
 ///
 /// See [kPrimaryStylusButton] and [kSecondaryStylusButton] for semantic names
 /// for some stylus buttons.
@@ -122,7 +122,8 @@ abstract class PointerEvent {
   /// Time of event dispatch, relative to an arbitrary timeline.
   final Duration timeStamp;
 
-  /// Unique identifier for the pointer, not reused.
+  /// Unique identifier for the pointer, not reused. Changes for each new
+  /// pointer down event.
   final int pointer;
 
   /// The kind of input device for which the event was generated.
@@ -400,12 +401,15 @@ class PointerRemovedEvent extends PointerEvent {
 ///
 /// See also:
 ///
+///  * [PointerEnterEvent], which reports when the pointer has entered an
+///    object.
+///  * [PointerExitEvent], which reports when the pointer has left an object.
 ///  * [PointerMoveEvent], which reports movement while the pointer is in
 ///    contact with the device.
 class PointerHoverEvent extends PointerEvent {
   /// Creates a pointer hover event.
   ///
-  /// All of the argument must be non-null.
+  /// All of the arguments must be non-null.
   const PointerHoverEvent({
     Duration timeStamp = Duration.zero,
     PointerDeviceKind kind = PointerDeviceKind.touch,
@@ -613,7 +617,7 @@ class PointerUpEvent extends PointerEvent {
 class PointerCancelEvent extends PointerEvent {
   /// Creates a pointer cancel event.
   ///
-  /// All of the argument must be non-null.
+  /// All of the arguments must be non-null.
   const PointerCancelEvent({
     Duration timeStamp = Duration.zero,
     int pointer = 0,
@@ -633,7 +637,7 @@ class PointerCancelEvent extends PointerEvent {
     double radiusMin = 0.0,
     double radiusMax = 0.0,
     double orientation = 0.0,
-    double tilt = 0.0
+    double tilt = 0.0,
   }) : super(
     timeStamp: timeStamp,
     pointer: pointer,

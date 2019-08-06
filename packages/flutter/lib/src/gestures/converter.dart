@@ -50,11 +50,12 @@ class PointerEventConverter {
   static _PointerState _ensureStateForPointer(ui.PointerData datum, Offset position) {
     return _pointers.putIfAbsent(
       datum.device,
-      () => _PointerState(position)
+      () => _PointerState(position),
     );
   }
 
-  /// Expand the given packet of pointer data into a sequence of framework pointer events.
+  /// Expand the given packet of pointer data into a sequence of framework
+  /// pointer events.
   ///
   /// The `devicePixelRatio` argument (usually given the value from
   /// [dart:ui.Window.devicePixelRatio]) is used to convert the incoming data

@@ -7,11 +7,16 @@ import 'constants.dart';
 import 'events.dart';
 import 'recognizer.dart';
 
-/// Signature for when a pointer has remained in contact with the screen at the
+/// Callback signature for [LongPressGestureRecognizer.onLongPress].
+///
+/// Called when a pointer has remained in contact with the screen at the
 /// same location for a long period of time.
 typedef GestureLongPressCallback = void Function();
 
-/// Signature for when a pointer stops contacting the screen after a long press gesture was detected.
+/// Callback signature for [LongPressGestureRecognizer.onLongPressUp].
+///
+/// Called when a pointer stops contacting the screen after a long press
+/// gesture was detected.
 typedef GestureLongPressUpCallback = void Function();
 
 /// Recognizes when the user has pressed down at the same location for a long

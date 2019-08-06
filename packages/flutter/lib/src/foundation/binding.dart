@@ -124,7 +124,7 @@ abstract class BindingBase {
           return <String, dynamic> {
             'value': saveCompilationTrace(),
           };
-        }
+        },
       );
     }
 
@@ -159,7 +159,7 @@ abstract class BindingBase {
                      .toString()
                      .substring('$TargetPlatform.'.length),
           };
-        }
+        },
       );
       return true;
     }());
@@ -237,7 +237,7 @@ abstract class BindingBase {
   /// This method is called by [reassembleApplication] to actually cause the
   /// application to reassemble, e.g. after a hot reload.
   ///
-  /// Bindings are expected to use this method to reregister anything that uses
+  /// Bindings are expected to use this method to re-register anything that uses
   /// closures, so that they do not keep pointing to old code, and to flush any
   /// caches of previously computed values, in case the new code would compute
   /// them differently. For example, the rendering layer triggers the entire
@@ -261,7 +261,7 @@ abstract class BindingBase {
   @protected
   void registerSignalServiceExtension({
     @required String name,
-    @required AsyncCallback callback
+    @required AsyncCallback callback,
   }) {
     assert(name != null);
     assert(callback != null);
@@ -270,7 +270,7 @@ abstract class BindingBase {
       callback: (Map<String, String> parameters) async {
         await callback();
         return <String, dynamic>{};
-      }
+      },
     );
   }
 
@@ -292,7 +292,7 @@ abstract class BindingBase {
   void registerBoolServiceExtension({
     @required String name,
     @required AsyncValueGetter<bool> getter,
-    @required AsyncValueSetter<bool> setter
+    @required AsyncValueSetter<bool> setter,
   }) {
     assert(name != null);
     assert(getter != null);
@@ -304,8 +304,8 @@ abstract class BindingBase {
           await setter(parameters['enabled'] == 'true');
           _postExtensionStateChangedEvent(name, await getter() ? 'true' : 'false');
         }
-        return <String, dynamic>{ 'enabled': await getter() ? 'true' : 'false' };
-      }
+        return <String, dynamic>{'enabled': await getter() ? 'true' : 'false'};
+      },
     );
   }
 
@@ -326,7 +326,7 @@ abstract class BindingBase {
   void registerNumericServiceExtension({
     @required String name,
     @required AsyncValueGetter<double> getter,
-    @required AsyncValueSetter<double> setter
+    @required AsyncValueSetter<double> setter,
   }) {
     assert(name != null);
     assert(getter != null);
@@ -338,8 +338,8 @@ abstract class BindingBase {
           await setter(double.parse(parameters[name]));
           _postExtensionStateChangedEvent(name, (await getter()).toString());
         }
-        return <String, dynamic>{ name: (await getter()).toString() };
-      }
+        return <String, dynamic>{name: (await getter()).toString()};
+      },
     );
   }
 
@@ -388,7 +388,7 @@ abstract class BindingBase {
   void registerStringServiceExtension({
     @required String name,
     @required AsyncValueGetter<String> getter,
-    @required AsyncValueSetter<String> setter
+    @required AsyncValueSetter<String> setter,
   }) {
     assert(name != null);
     assert(getter != null);
@@ -400,8 +400,8 @@ abstract class BindingBase {
           await setter(parameters['value']);
           _postExtensionStateChangedEvent(name, await getter());
         }
-        return <String, dynamic>{ 'value': await getter() };
-      }
+        return <String, dynamic>{'value': await getter()};
+      },
     );
   }
 
@@ -425,27 +425,33 @@ abstract class BindingBase {
   /// not wrapped in a guard that allows the tree shaker to remove it (see
   /// sample code below).
   ///
-  /// ## Sample Code
-  ///
+  /// {@tool sample}
   /// The following code registers a service extension that is only included in
-  /// debug builds:
+  /// debug builds.
   ///
   /// ```dart
-  /// assert(() {
-  ///   // Register your service extension here.
-  ///   return true;
-  /// }());
-  ///
+  /// void myRegistrationFunction() {
+  ///   assert(() {
+  ///     // Register your service extension here.
+  ///     return true;
+  ///   }());
+  /// }
   /// ```
+  /// {@end-tool}
   ///
+  /// {@tool sample}
   /// A service extension registered with the following code snippet is
-  /// available in debug and profile mode:
+  /// available in debug and profile mode.
   ///
   /// ```dart
-  /// if (!const bool.fromEnvironment('dart.vm.product')) {
-  //   // Register your service extension here.
-  // }
+  /// void myRegistrationFunction() {
+  ///   // kReleaseMode is defined in the 'flutter/foundation.dart' package.
+  ///   if (!kReleaseMode) {
+  ///     // Register your service extension here.
+  ///   }
+  /// }
   /// ```
+  /// {@end-tool}
   ///
   /// Both guards ensure that Dart's tree shaker can remove the code for the
   /// service extension in release builds.
@@ -453,7 +459,7 @@ abstract class BindingBase {
   @protected
   void registerServiceExtension({
     @required String name,
-    @required ServiceExtensionCallback callback
+    @required ServiceExtensionCallback callback,
   }) {
     assert(name != null);
     assert(callback != null);
@@ -497,7 +503,7 @@ abstract class BindingBase {
         FlutterError.reportError(FlutterErrorDetails(
           exception: caughtException,
           stack: caughtStack,
-          context: 'during a service extension callback for "$method"'
+          context: 'during a service extension callback for "$method"',
         ));
         return developer.ServiceExtensionResponse.error(
           developer.ServiceExtensionResponse.extensionError,
@@ -505,7 +511,7 @@ abstract class BindingBase {
             'exception': caughtException.toString(),
             'stack': caughtStack.toString(),
             'method': method,
-          })
+          }),
         );
       }
     });

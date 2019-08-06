@@ -33,7 +33,7 @@ typedef RecognizerCallback<T> = T Function();
 ///
 ///   * [DragGestureRecognizer.dragStartBehavior], which gives an example for the different behaviors.
 enum DragStartBehavior {
-  /// Set the initial offset, at the position where the first down even was
+  /// Set the initial offset, at the position where the first down event was
   /// detected.
   down,
 
@@ -128,7 +128,7 @@ abstract class GestureRecognizer extends GestureArenaMember with DiagnosticableT
           information.writeln('Handler: $name');
           information.writeln('Recognizer:');
           information.writeln('  $this');
-        }
+        },
       ));
     }
     return result;
@@ -261,11 +261,11 @@ abstract class OneSequenceGestureRecognizer extends GestureRecognizer {
 
 /// The possible states of a [PrimaryPointerGestureRecognizer].
 ///
-/// The recognizer advances from [ready] to [possible] when starts tracking a
-/// primary pointer. When the primary pointer is resolve (either accepted or
-/// or rejected), the recognizers advances to [defunct]. Once the recognizer
-/// has stopped tracking any remaining pointers, the recognizer returns to
-/// [ready].
+/// The recognizer advances from [ready] to [possible] when it starts tracking a
+/// primary pointer. When the primary pointer is resolved in the gesture
+/// arena (either accepted or rejected), the recognizers advances to [defunct].
+/// Once the recognizer has stopped tracking any remaining pointers, the
+/// recognizer returns to [ready].
 enum GestureRecognizerState {
   /// The recognizer is ready to start recognizing a gesture.
   ready,
@@ -283,10 +283,16 @@ enum GestureRecognizerState {
 
 /// A base class for gesture recognizers that track a single primary pointer.
 ///
-/// Gestures based on this class will reject the gesture if the primary pointer
-/// travels beyond [kTouchSlop] pixels from the original contact point.
+/// Gestures based on this class will stop tracking the gesture if the primary
+/// pointer travels beyond [preAcceptSlopTolerance] or [postAcceptSlopTolerance]
+/// pixels from the original contact point of the gesture.
+///
+/// If the [preAcceptSlopTolerance] was breached before the gesture was accepted
+/// in the gesture arena, the gesture will be rejected.
 abstract class PrimaryPointerGestureRecognizer extends OneSequenceGestureRecognizer {
   /// Initializes the [deadline] field during construction of subclasses.
+  ///
+  /// {@macro flutter.gestures.gestureRecognizer.kind}
   PrimaryPointerGestureRecognizer({
     this.deadline,
     Object debugOwner,

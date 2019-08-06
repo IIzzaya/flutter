@@ -52,6 +52,8 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
   /// Initialize the object.
   ///
   /// [dragStartBehavior] must not be null.
+  ///
+  /// {@macro flutter.gestures.gestureRecognizer.kind}
   DragGestureRecognizer({
     Object debugOwner,
     this.dragStartBehavior = DragStartBehavior.down,
@@ -66,7 +68,7 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
   /// first detected.
   ///
   /// For more information about the gesture arena:
-  /// https://flutter.io/docs/development/ui/advanced/gestures#gesture-disambiguation
+  /// https://flutter.dev/docs/development/ui/advanced/gestures#gesture-disambiguation
   ///
   /// By default, the drag start behavior is [DragStartBehavior.start].
   ///

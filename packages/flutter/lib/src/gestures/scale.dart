@@ -49,7 +49,8 @@ class ScaleStartDetails {
 class ScaleUpdateDetails {
   /// Creates details for [GestureScaleUpdateCallback].
   ///
-  /// The [focalPoint], [scale], [rotation] arguments must not be null. The [scale]
+  /// The [focalPoint], [scale], [horizontalScale], [verticalScale], [rotation]
+  /// arguments must not be null. The [scale], [horizontalScale], and [verticalScale]
   /// argument must be greater than or equal to zero.
   ScaleUpdateDetails({
     this.focalPoint = Offset.zero,
@@ -59,16 +60,26 @@ class ScaleUpdateDetails {
        assert(scale != null && scale >= 0.0),
        assert(rotation != null);
 
-  /// The focal point of the pointers in contact with the screen. Reported in
-  /// global coordinates.
+  /// The focal point of the pointers in contact with the screen.
+  ///
+  /// Reported in global coordinates.
   final Offset focalPoint;
 
-  /// The scale implied by the pointers in contact with the screen. A value
-  /// greater than or equal to zero.
+  /// The scale implied by the average distance between the pointers in contact
+  /// with the screen.
+  ///
+  /// This value must be greater than or equal to zero.
+  ///
+  /// See also:
+  ///
+  ///  * [horizontalScale], which is the scale along the horizontal axis.
+  ///  * [verticalScale], which is the scale along the vertical axis.
   final double scale;
 
   /// The angle implied by the first two pointers to enter in contact with
-  /// the screen. Expressed in radians.
+  /// the screen.
+  ///
+  /// Expressed in radians.
   final double rotation;
 
   @override
@@ -121,7 +132,7 @@ class _LineBetweenPointers{
     this.pointerStartLocation = Offset.zero,
     this.pointerStartId = 0,
     this.pointerEndLocation = Offset.zero,
-    this.pointerEndId = 1
+    this.pointerEndId = 1,
   }) : assert(pointerStartLocation != null && pointerEndLocation != null),
        assert(pointerStartId != null && pointerEndId != null),
        assert(pointerStartId != pointerEndId);
