@@ -69,7 +69,7 @@ class TextSelectionPoint {
   ///
   /// The [point] argument must not be null.
   const TextSelectionPoint(this.point, this.direction)
-      : assert(point != null);
+    : assert(point != null);
 
   /// Coordinates of the lower left or lower right corner of the selection,
   /// relative to the top left of the [RenderEditable] object.
@@ -391,7 +391,7 @@ class RenderEditable extends RenderBox {
         onSelectionChanged(
           TextSelection(
             baseOffset: _baseOffset,
-            extentOffset: newOffset
+            extentOffset: newOffset,
           ),
           this,
           SelectionChangedCause.keyboard,
@@ -400,7 +400,7 @@ class RenderEditable extends RenderBox {
         onSelectionChanged(
           TextSelection(
             baseOffset: newOffset,
-            extentOffset: _baseOffset
+            extentOffset: _baseOffset,
           ),
           this,
           SelectionChangedCause.keyboard,
@@ -487,12 +487,12 @@ class RenderEditable extends RenderBox {
       textSelectionDelegate.textEditingValue = TextEditingValue(
         text: selection.textBefore(text.text)
           + selection.textAfter(text.text).substring(1),
-        selection: TextSelection.collapsed(offset: selection.start)
+        selection: TextSelection.collapsed(offset: selection.start),
       );
     } else {
       textSelectionDelegate.textEditingValue = TextEditingValue(
         text: selection.textBefore(text.text),
-        selection: TextSelection.collapsed(offset: selection.start)
+        selection: TextSelection.collapsed(offset: selection.start),
       );
     }
   }
@@ -622,13 +622,11 @@ class RenderEditable extends RenderBox {
       assert(!_listenerAttached);
       RawKeyboard.instance.addListener(_handleKeyEvent);
       _listenerAttached = true;
-    }
-    else {
+    } else {
       assert(_listenerAttached);
       RawKeyboard.instance.removeListener(_handleKeyEvent);
       _listenerAttached = false;
     }
-
     markNeedsSemanticsUpdate();
   }
 
@@ -732,7 +730,7 @@ class RenderEditable extends RenderBox {
   /// The padding applied to text field. Used to determine the bounds when
   /// moving the floating cursor.
   ///
-  /// Defaults to a padding with left, right set to 3 and top, bottom to 6.
+  /// Defaults to a padding with left, top and right set to 4, bottom to 5.
   EdgeInsets get floatingCursorAddedMargin => _floatingCursorAddedMargin;
   EdgeInsets _floatingCursorAddedMargin;
   set floatingCursorAddedMargin(EdgeInsets value) {

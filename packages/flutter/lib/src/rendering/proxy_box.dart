@@ -147,7 +147,7 @@ abstract class RenderProxyBoxWithHitTestBehavior extends RenderProxyBox {
   /// By default, the [behavior] is [HitTestBehavior.deferToChild].
   RenderProxyBoxWithHitTestBehavior({
     this.behavior = HitTestBehavior.deferToChild,
-    RenderBox child
+    RenderBox child,
   }) : super(child);
 
   /// How to behave during hit testing.
@@ -304,7 +304,7 @@ class RenderLimitedBox extends RenderProxyBox {
   RenderLimitedBox({
     RenderBox child,
     double maxWidth = double.infinity,
-    double maxHeight = double.infinity
+    double maxHeight = double.infinity,
   }) : assert(maxWidth != null && maxWidth >= 0.0),
        assert(maxHeight != null && maxHeight >= 0.0),
        _maxWidth = maxWidth,
@@ -338,7 +338,7 @@ class RenderLimitedBox extends RenderProxyBox {
       minWidth: constraints.minWidth,
       maxWidth: constraints.hasBoundedWidth ? constraints.maxWidth : constraints.constrainWidth(maxWidth),
       minHeight: constraints.minHeight,
-      maxHeight: constraints.hasBoundedHeight ? constraints.maxHeight : constraints.constrainHeight(maxHeight)
+      maxHeight: constraints.hasBoundedHeight ? constraints.maxHeight : constraints.constrainHeight(maxHeight),
     );
   }
 
@@ -547,7 +547,7 @@ class RenderIntrinsicWidth extends RenderProxyBox {
   RenderIntrinsicWidth({
     double stepWidth,
     double stepHeight,
-    RenderBox child
+    RenderBox child,
   }) : assert(stepWidth == null || stepWidth > 0.0),
        assert(stepHeight == null || stepHeight > 0.0),
        _stepWidth = stepWidth,
@@ -664,7 +664,7 @@ class RenderIntrinsicWidth extends RenderProxyBox {
 class RenderIntrinsicHeight extends RenderProxyBox {
   /// Creates a render object that sizes itself to its child's intrinsic height.
   RenderIntrinsicHeight({
-    RenderBox child
+    RenderBox child,
   }) : super(child);
 
   @override
@@ -878,7 +878,7 @@ class RenderAnimatedOpacity extends RenderProxyBox {
     super.attach(owner);
     _opacity.addListener(_updateOpacity);
     _updateOpacity(); // in case it changed while we weren't listening
- }
+  }
 
   @override
   void detach() {
@@ -1152,7 +1152,9 @@ abstract class _RenderCustomClip<T> extends RenderProxyBox {
     RenderBox child,
     CustomClipper<T> clipper,
     this.clipBehavior = Clip.antiAlias,
-  }) : _clipper = clipper, assert(clipBehavior != null), super(child);
+  }) : _clipper = clipper,
+       assert(clipBehavior != null),
+       super(child);
 
   /// If non-null, determines which clip to use on the child.
   CustomClipper<T> get clipper => _clipper;
@@ -1178,7 +1180,7 @@ abstract class _RenderCustomClip<T> extends RenderProxyBox {
   void attach(PipelineOwner owner) {
     super.attach(owner);
     _clipper?._reclip?.addListener(_markNeedsClip);
- }
+  }
 
   @override
   void detach() {
@@ -1317,7 +1319,9 @@ class RenderClipRRect extends _RenderCustomClip<RRect> {
     BorderRadius borderRadius = BorderRadius.zero,
     CustomClipper<RRect> clipper,
     Clip clipBehavior = Clip.antiAlias,
-  }) : assert(clipBehavior != Clip.none), _borderRadius = borderRadius, super(child: child, clipper: clipper, clipBehavior: clipBehavior) {
+  }) : assert(clipBehavior != Clip.none),
+       _borderRadius = borderRadius,
+       super(child: child, clipper: clipper, clipBehavior: clipBehavior) {
     assert(_borderRadius != null || clipper != null);
   }
 
@@ -1388,7 +1392,8 @@ class RenderClipOval extends _RenderCustomClip<Rect> {
     RenderBox child,
     CustomClipper<Rect> clipper,
     Clip clipBehavior = Clip.antiAlias,
-  }) : assert(clipBehavior != Clip.none), super(child: child, clipper: clipper, clipBehavior: clipBehavior);
+  }) : assert(clipBehavior != Clip.none),
+       super(child: child, clipper: clipper, clipBehavior: clipBehavior);
 
   Rect _cachedRect;
   Path _cachedPath;
@@ -1463,7 +1468,8 @@ class RenderClipPath extends _RenderCustomClip<Path> {
     RenderBox child,
     CustomClipper<Path> clipper,
     Clip clipBehavior = Clip.antiAlias,
-  }) : assert(clipBehavior != Clip.none), super(child: child, clipper: clipper, clipBehavior: clipBehavior);
+  }) : assert(clipBehavior != Clip.none),
+       super(child: child, clipper: clipper, clipBehavior: clipBehavior);
 
   @override
   Path get _defaultClip => Path()..addRect(Offset.zero & size);
@@ -2004,7 +2010,7 @@ class RenderTransform extends RenderProxyBox {
     AlignmentGeometry alignment,
     TextDirection textDirection,
     this.transformHitTests = true,
-    RenderBox child
+    RenderBox child,
   }) : assert(transform != null),
        super(child) {
     this.transform = transform;
@@ -2113,14 +2119,14 @@ class RenderTransform extends RenderProxyBox {
   }
 
   /// Concatenates a translation by (x, y, z) into the transform.
-  void translate(double x, [double y = 0.0, double z = 0.0]) {
+  void translate(double x, [ double y = 0.0, double z = 0.0 ]) {
     _transform.translate(x, y, z);
     markNeedsPaint();
     markNeedsSemanticsUpdate();
   }
 
   /// Concatenates a scale into the transform.
-  void scale(double x, [double y, double z]) {
+  void scale(double x, [ double y, double z ]) {
     _transform.scale(x, y, z);
     markNeedsPaint();
     markNeedsSemanticsUpdate();
@@ -2386,7 +2392,7 @@ class RenderFractionalTranslation extends RenderProxyBox {
   RenderFractionalTranslation({
     @required Offset translation,
     this.transformHitTests = true,
-    RenderBox child
+    RenderBox child,
   }) : assert(translation != null),
        _translation = translation,
        super(child);
@@ -2521,6 +2527,8 @@ class RenderPointerListener extends RenderProxyBoxWithHitTestBehavior {
   @override
   void handleEvent(PointerEvent event, HitTestEntry entry) {
     assert(debugHandleEvent(event, entry));
+    // The onPointerEnter, onPointerHover, and onPointerExit events are are
+    // triggered from within the MouseTracker, not here.
     if (onPointerDown != null && event is PointerDownEvent)
       return onPointerDown(event);
     if (onPointerMove != null && event is PointerMoveEvent)
@@ -2641,7 +2649,7 @@ class RenderRepaintBoundary extends RenderProxyBox {
   ///
   ///  * [OffsetLayer.toImage] for a similar API at the layer level.
   ///  * [dart:ui.Scene.toImage] for more information about the image returned.
-  Future<ui.Image> toImage({double pixelRatio = 1.0}) {
+  Future<ui.Image> toImage({ double pixelRatio = 1.0 }) {
     assert(!debugNeedsPaint);
     return layer.toImage(Offset.zero & size, pixelRatio: pixelRatio);
   }
@@ -2759,8 +2767,10 @@ class RenderIgnorePointer extends RenderProxyBox {
   RenderIgnorePointer({
     RenderBox child,
     bool ignoring = true,
-    bool ignoringSemantics
-  }) : _ignoring = ignoring, _ignoringSemantics = ignoringSemantics, super(child) {
+    bool ignoringSemantics,
+  }) : _ignoring = ignoring,
+       _ignoringSemantics = ignoringSemantics,
+       super(child) {
     assert(_ignoring != null);
   }
 
@@ -2832,7 +2842,7 @@ class RenderOffstage extends RenderProxyBox {
   /// Creates an offstage render object.
   RenderOffstage({
     bool offstage = true,
-    RenderBox child
+    RenderBox child,
   }) : assert(offstage != null),
        _offstage = offstage,
        super(child);
@@ -3043,7 +3053,7 @@ class RenderMetaData extends RenderProxyBoxWithHitTestBehavior {
   RenderMetaData({
     this.metaData,
     HitTestBehavior behavior = HitTestBehavior.deferToChild,
-    RenderBox child
+    RenderBox child,
   }) : super(behavior: behavior, child: child);
 
   /// Opaque meta data ignored by the render tree
@@ -3068,7 +3078,7 @@ class RenderSemanticsGestureHandler extends RenderProxyBox {
     GestureLongPressCallback onLongPress,
     GestureDragUpdateCallback onHorizontalDragUpdate,
     GestureDragUpdateCallback onVerticalDragUpdate,
-    this.scrollFactor = 0.8
+    this.scrollFactor = 0.8,
   }) : assert(scrollFactor != null),
        _onTap = onTap,
        _onLongPress = onLongPress,
@@ -3380,7 +3390,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
     markNeedsSemanticsUpdate();
   }
 
-  /// Whether decendants of this [RenderObject] should have their semantic
+  /// Whether descendants of this [RenderObject] should have their semantic
   /// information ignored.
   ///
   /// When this flag is set to true, all child semantics nodes are ignored.
@@ -4041,7 +4051,7 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
   ///
   /// See also:
   ///
-  ///  * [CustomSemanticsAction], for an explaination of custom actions.
+  ///  * [CustomSemanticsAction], for an explanation of custom actions.
   Map<CustomSemanticsAction, VoidCallback> get customSemanticsActions => _customSemanticsActions;
   Map<CustomSemanticsAction, VoidCallback> _customSemanticsActions;
   set customSemanticsActions(Map<CustomSemanticsAction, VoidCallback> value) {
@@ -4263,7 +4273,11 @@ class RenderSemanticsAnnotations extends RenderProxyBox {
 class RenderBlockSemantics extends RenderProxyBox {
   /// Create a render object that blocks semantics for nodes below it in paint
   /// order.
-  RenderBlockSemantics({ RenderBox child, bool blocking = true, }) : _blocking = blocking, super(child);
+  RenderBlockSemantics({
+    RenderBox child,
+    bool blocking = true,
+  }) : _blocking = blocking,
+       super(child);
 
   /// Whether this render object is blocking semantics of previously painted
   /// [RenderObject]s below a common semantics boundary from the semantic tree.
@@ -4322,7 +4336,8 @@ class RenderExcludeSemantics extends RenderProxyBox {
   RenderExcludeSemantics({
     RenderBox child,
     bool excluding = true,
-  }) : _excluding = excluding, super(child) {
+  }) : _excluding = excluding,
+       super(child) {
     assert(_excluding != null);
   }
 
@@ -4367,8 +4382,8 @@ class RenderIndexedSemantics extends RenderProxyBox {
     RenderBox child,
     @required int index,
   }) : assert(index != null),
-        _index = index,
-        super(child);
+       _index = index,
+       super(child);
 
   /// The index used to annotated child semantics.
   int get index => _index;
@@ -4449,7 +4464,7 @@ class RenderLeaderLayer extends RenderProxyBox {
 ///
 /// Hit testing on descendants of this render object will only work if the
 /// target position is within the box that this render object's parent considers
-/// to be hitable.
+/// to be hittable.
 ///
 /// See also:
 ///

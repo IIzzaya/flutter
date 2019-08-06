@@ -222,8 +222,7 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Semanti
   /// Pump the rendering pipeline to generate a frame.
   ///
   /// This method is called by [handleDrawFrame], which itself is called
-  /// automatically by the engine when when it is time to lay out and paint a
-  /// frame.
+  /// automatically by the engine when it is time to lay out and paint a frame.
   ///
   /// Each frame consists of the following phases:
   ///
@@ -302,8 +301,7 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Semanti
   void hitTest(HitTestResult result, Offset position) {
     assert(renderView != null);
     renderView.hitTest(result, position: position);
-    // This super call is safe since it will be bound to a mixed-in declaration.
-    super.hitTest(result, position); // ignore: abstract_super_member_reference
+    super.hitTest(result, position);
   }
 
   Future<void> _forceRepaint() {
