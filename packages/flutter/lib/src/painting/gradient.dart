@@ -42,8 +42,8 @@ _ColorsAndStops _interpolateColorsAndStops(List<Color> aColors, List<double> aSt
 ///
 /// See also:
 ///
-///  * [dart:ui.Gradient], the class in the [dart:ui] library that is
-///    encapsulated by this class and its subclasses.
+///  * [Gradient](https://api.flutter.dev/flutter/dart-ui/Gradient-class.html), the class in the [dart:ui] library.
+///
 @immutable
 abstract class Gradient {
   /// Initialize the gradient's colors and stops.
@@ -506,7 +506,7 @@ class RadialGradient extends Gradient {
     List<double> stops,
     this.tileMode = TileMode.clamp,
     this.focal,
-    this.focalRadius = 0.0
+    this.focalRadius = 0.0,
   }) : assert(center != null),
        assert(radius != null),
        assert(tileMode != null),
@@ -598,7 +598,7 @@ class RadialGradient extends Gradient {
       stops: stops,
       tileMode: tileMode,
       focal: focal,
-      focalRadius: focalRadius
+      focalRadius: focalRadius,
     );
   }
 

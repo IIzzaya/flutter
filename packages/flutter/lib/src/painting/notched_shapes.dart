@@ -6,10 +6,12 @@ import 'basic_types.dart';
 ///
 /// Typically used as the outline of a 'host' widget to make a notch that
 /// accommodates a 'guest' widget. e.g the [BottomAppBar] may have a notch to
-/// accomodate the [FloatingActionBar].
-
-/// See also: [ShapeBorder], which defines a shaped border without a dynamic
-/// notch.
+/// accommodate the [FloatingActionButton].
+///
+/// See also:
+///
+///  * [ShapeBorder], which defines a shaped border without a dynamic notch.
+///  * [AutomaticNotchedShape], an adapter from [ShapeBorder] to [NotchedShape].
 abstract class NotchedShape {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
@@ -36,7 +38,7 @@ class CircularNotchedRectangle implements NotchedShape {
   /// `host` is the bounding box for the returned shape. Conceptually this is
   /// the rectangle to which the notch will be applied.
   ///
-  /// `guest` is the bounding box of a circle that the notch accomodates. All
+  /// `guest` is the bounding box of a circle that the notch accommodates. All
   /// points in the circle bounded by `guest` will be outside of the returned
   /// path.
   ///
@@ -55,7 +57,7 @@ class CircularNotchedRectangle implements NotchedShape {
     // We build a path for the notch from 3 segments:
     // Segment A - a Bezier curve from the host's top edge to segment B.
     // Segment B - an arc with radius notchRadius.
-    // Segment C - a Bezier curver from segment B back to the host's top edge.
+    // Segment C - a Bezier curve from segment B back to the host's top edge.
     //
     // A detailed explanation and the derivation of the formulas below is
     // available at: https://goo.gl/Ufzrqn

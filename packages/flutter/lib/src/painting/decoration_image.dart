@@ -261,7 +261,7 @@ class DecorationImagePainter {
       centerSlice: _details.centerSlice,
       repeat: _details.repeat,
       flipHorizontally: flipHorizontally,
-      filterQuality: FilterQuality.low
+      filterQuality: FilterQuality.low,
     );
 
     if (clipPath != null)
@@ -373,7 +373,7 @@ void paintImage({
   ImageRepeat repeat = ImageRepeat.noRepeat,
   bool flipHorizontally = false,
   bool invertColors = false,
-  FilterQuality filterQuality = FilterQuality.low
+  FilterQuality filterQuality = FilterQuality.low,
 }) {
   assert(canvas != null);
   assert(image != null);
@@ -388,7 +388,7 @@ void paintImage({
   if (centerSlice != null) {
     sliceBorder = Offset(
       centerSlice.left + inputSize.width - centerSlice.right,
-      centerSlice.top + inputSize.height - centerSlice.bottom
+      centerSlice.top + inputSize.height - centerSlice.bottom,
     );
     outputSize -= sliceBorder;
     inputSize -= sliceBorder;
