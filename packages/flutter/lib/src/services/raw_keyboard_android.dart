@@ -23,11 +23,11 @@ class RawKeyEventDataAndroid extends RawKeyEventData {
     this.keyCode = 0,
     this.scanCode = 0,
     this.metaState = 0,
-  })  : assert(flags != null),
-        assert(codePoint != null),
-        assert(keyCode != null),
-        assert(scanCode != null),
-        assert(metaState != null);
+  }) : assert(flags != null),
+       assert(codePoint != null),
+       assert(keyCode != null),
+       assert(scanCode != null),
+       assert(metaState != null);
 
   /// The current set of additional flags for this event.
   ///
@@ -100,7 +100,7 @@ class RawKeyEventDataAndroid extends RawKeyEventData {
   }
 
   @override
-  bool isModifierPressed(ModifierKey key, {KeyboardSide side = KeyboardSide.any}) {
+  bool isModifierPressed(ModifierKey key, { KeyboardSide side = KeyboardSide.any }) {
     assert(side != null);
     switch (key) {
       case ModifierKey.controlModifier:
