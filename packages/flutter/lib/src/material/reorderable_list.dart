@@ -60,13 +60,13 @@ class ReorderableListView extends StatefulWidget {
     this.scrollDirection = Axis.vertical,
     this.padding,
     this.reverse = false,
-  }): assert(scrollDirection != null),
-      assert(onReorder != null),
-      assert(children != null),
-      assert(
-        children.every((Widget w) => w.key != null),
-        'All children of this widget must have a key.',
-      );
+  }) : assert(scrollDirection != null),
+       assert(onReorder != null),
+       assert(children != null),
+       assert(
+         children.every((Widget w) => w.key != null),
+         'All children of this widget must have a key.',
+       );
 
   /// A non-reorderable header widget to show before the list.
   ///
@@ -328,7 +328,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
 
   // Wraps children in Row or Column, so that the children flow in
   // the widget's scrollDirection.
-  Widget _buildContainerForScrollDirection({List<Widget> children}) {
+  Widget _buildContainerForScrollDirection({ List<Widget> children }) {
     switch (widget.scrollDirection) {
       case Axis.horizontal:
         return Row(children: children);
@@ -492,7 +492,7 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
           SizeTransition(
             sizeFactor: _entranceController,
             axis: widget.scrollDirection,
-            child: spacing
+            child: spacing,
           ),
           child,
         ]);
@@ -525,8 +525,8 @@ class _ReorderableListContentState extends State<_ReorderableListContent> with T
           // If the target is not the original starting point, then we will accept the drop.
           return _dragging == toAccept && toAccept != toWrap.key;
         },
-        onAccept: (Key accepted) {},
-        onLeave: (Key leaving) {},
+        onAccept: (Key accepted) { },
+        onLeave: (Key leaving) { },
       );
     });
   }

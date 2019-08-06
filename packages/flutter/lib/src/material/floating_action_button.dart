@@ -41,6 +41,8 @@ class _DefaultHeroTag {
 /// to promote a primary action in the application. Floating action buttons are
 /// most commonly used in the [Scaffold.floatingActionButton] field.
 ///
+/// {@youtube 560 315 https://www.youtube.com/watch?v=2uaoEDOgk_I}
+///
 /// Use at most a single floating action button per screen. Floating action
 /// buttons should be used for positive actions such as "create", "share", or
 /// "navigate". (If more than one floating action button is used within a
@@ -52,6 +54,58 @@ class _DefaultHeroTag {
 /// action button as there is no indication to the user that the button is
 /// disabled. Consider changing the [backgroundColor] if disabling the floating
 /// action button.
+///
+/// {@tool snippet --template=stateless_widget_material}
+/// This example shows how to make a simple [FloatingActionButton] in a
+/// [Scaffold], with a pink [backgroundColor] and a thumbs up [Icon].
+///
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return Scaffold(
+///     appBar: AppBar(
+///       title: Text('Floating Action Button Sample'),
+///     ),
+///     body: Center(
+///       child: Text('Press the button below!')
+///     ),
+///     floatingActionButton: FloatingActionButton(
+///       onPressed: () {
+///         // Add your onPressed code here!
+///       },
+///       child: Icon(Icons.thumb_up),
+///       backgroundColor: Colors.pink,
+///     ),
+///   );
+/// }
+/// ```
+/// {@end-tool}
+///
+/// {@tool snippet --template=stateless_widget_material}
+/// This example shows how to make an extended [FloatingActionButton] in a
+/// [Scaffold], with a  pink [backgroundColor] and a thumbs up [Icon] and a
+/// [Text] label.
+///
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return Scaffold(
+///     appBar: AppBar(
+///       title: Text('Floating Action Button Sample'),
+///     ),
+///     body: Center(
+///       child: Text('Press the extended button below!'),
+///     ),
+///     floatingActionButton: FloatingActionButton.extended(
+///       onPressed: () {
+///         // Add your onPressed code here!
+///       },
+///       label: Text('Approve'),
+///       icon: Icon(Icons.thumb_up),
+///       backgroundColor: Colors.pink,
+///     ),
+///   );
+/// }
+/// ```
+/// {@end-tool}
 ///
 /// See also:
 ///
@@ -95,10 +149,9 @@ class FloatingActionButton extends StatelessWidget {
   /// Creates a wider [StadiumBorder]-shaped floating action button with both
   /// an [icon] and a [label].
   ///
-  /// The [label], [icon], [elevation], [highlightElevation], [clipBehavior] and
-  /// [shape] arguments must not be null. Additionally, [elevation]
-  /// [highlightElevation], and [disabledElevation] (if specified) must be
-  /// non-negative.
+  /// The [label] and [clipBehavior] arguments must non-null. Additionally,
+  /// [elevation], [highlightElevation], and [disabledElevation] (if specified)
+  /// must be non-negative.
   FloatingActionButton.extended({
     Key key,
     this.tooltip,
@@ -178,7 +231,7 @@ class FloatingActionButton extends StatelessWidget {
   /// If this is set to null, the button will be disabled.
   final VoidCallback onPressed;
 
-  /// The z-coordinate at which to place this button releative to its parent.
+  /// The z-coordinate at which to place this button relative to its parent.
   ///
   /// This controls the size of the shadow below the floating action button.
   ///

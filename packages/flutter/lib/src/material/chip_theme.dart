@@ -46,9 +46,9 @@ class ChipTheme extends InheritedWidget {
     Key key,
     @required this.data,
     @required Widget child,
-  })  : assert(child != null),
-        assert(data != null),
-        super(key: key, child: child);
+  }) : assert(child != null),
+       assert(data != null),
+       super(key: key, child: child);
 
   /// Specifies the color, shape, and text style values for descendant chip
   /// widgets.
@@ -162,7 +162,8 @@ class ChipTheme extends InheritedWidget {
 ///  * [ThemeData], which has a default [ChipThemeData].
 class ChipThemeData extends Diagnosticable {
   /// Create a [ChipThemeData] given a set of exact values. All the values
-  /// must be specified.
+  /// must be specified except for [shadowColor], [selectedShadowColor],
+  /// [elevation], and [pressElevation], which may be null.
   ///
   /// This will rarely be used directly. It is used by [lerp] to
   /// create intermediate themes based on two themes.

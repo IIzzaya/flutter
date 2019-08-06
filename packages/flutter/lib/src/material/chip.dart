@@ -57,7 +57,7 @@ const Icon _kDefaultDeleteIcon = Icon(Icons.cancel, size: _kDeleteIconSize);
 ///    chips contain related descriptive text or categories.
 ///  * [FilterChip], uses tags or descriptive words as a way to filter content.
 ///  * [ActionChip], represents an action related to primary content.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 abstract class ChipAttributes {
   // This class is intended to be used as an interface, and should not be
   // extended directly.
@@ -125,7 +125,7 @@ abstract class ChipAttributes {
 ///  * [InputChip], a chip that represents a complex piece of information, such
 ///    as an entity (person, place, or thing) or conversational text, in a
 ///    compact form.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 abstract class DeletableChipAttributes {
   // This class is intended to be used as an interface, and should not be
   // extended directly.
@@ -144,7 +144,8 @@ abstract class DeletableChipAttributes {
   /// that the user tapped the delete button. In order to delete the chip, you
   /// have to do something similar to the following sample:
   ///
-  /// {@tool snippet --template=stateful_widget}
+  /// {@tool snippet --template=stateful_widget_scaffold}
+  ///
   /// This sample shows how to use [onDeleted] to remove an entry when the
   /// delete button is tapped.
   ///
@@ -199,7 +200,7 @@ abstract class DeletableChipAttributes {
   /// ```dart
   /// @override
   /// Widget build(BuildContext context) {
-  ///   return CastList();
+  ///   return Center(child: CastList());
   /// }
   /// ```
   /// {@end-tool}
@@ -227,7 +228,7 @@ abstract class DeletableChipAttributes {
 ///  * [ChoiceChip], allows a single selection from a set of options. Choice
 ///    chips contain related descriptive text or categories.
 ///  * [FilterChip], uses tags or descriptive words as a way to filter content.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 abstract class SelectableChipAttributes {
   // This class is intended to be used as an interface, and should not be
   // extended directly.
@@ -241,7 +242,8 @@ abstract class SelectableChipAttributes {
   /// Must not be null. Defaults to false.
   bool get selected;
 
-  /// Called when the chip should change between selected and deselected states.
+  /// Called when the chip should change between selected and de-selected
+  /// states.
   ///
   /// When the chip is tapped, then the [onSelected] callback, if set, will be
   /// applied to `!selected` (see [selected]).
@@ -328,7 +330,7 @@ abstract class SelectableChipAttributes {
 ///  * [ChoiceChip], allows a single selection from a set of options. Choice
 ///    chips contain related descriptive text or categories.
 ///  * [FilterChip], uses tags or descriptive words as a way to filter content.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 abstract class DisabledChipAttributes {
   // This class is intended to be used as an interface, and should not be
   // extended directly.
@@ -375,7 +377,7 @@ abstract class DisabledChipAttributes {
 ///    chips contain related descriptive text or categories.
 ///  * [FilterChip], uses tags or descriptive words as a way to filter content.
 ///  * [ActionChip], represents an action related to primary content.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 abstract class TappableChipAttributes {
   // This class is intended to be used as an interface, and should not be
   // extended directly.
@@ -428,8 +430,10 @@ abstract class TappableChipAttributes {
 /// Supplying a non-null [onDeleted] callback will cause the chip to include a
 /// button for deleting the chip.
 ///
-/// Requires one of its ancestors to be a [Material] widget. The [label]
-/// and [clipBehavior] arguments must not be null.
+/// Its ancestors must include [Material], [MediaQuery], [Directionality], and
+/// [MaterialLocalizations]. Typically all of these widgets are provided by
+/// [MaterialApp] and [Scaffold]. The [label] and [clipBehavior] arguments must
+/// not be null.
 ///
 /// {@tool sample}
 ///
@@ -456,11 +460,12 @@ abstract class TappableChipAttributes {
 ///  * [CircleAvatar], which shows images or initials of entities.
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 class Chip extends StatelessWidget implements ChipAttributes, DeletableChipAttributes {
   /// Creates a material design chip.
   ///
   /// The [label] and [clipBehavior] arguments must not be null.
+  /// The [elevation] must be null or non-negative.
   const Chip({
     Key key,
     this.avatar,
@@ -574,7 +579,7 @@ class Chip extends StatelessWidget implements ChipAttributes, DeletableChipAttri
 ///  * [CircleAvatar], which shows images or initials of people.
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 class InputChip extends StatelessWidget
     implements
         ChipAttributes,
@@ -588,7 +593,8 @@ class InputChip extends StatelessWidget
   /// the same time.
   ///
   /// The [label], [isEnabled], [selected], and [clipBehavior] arguments must
-  /// not be null.
+  /// not be null. The [pressElevation] and [elevation] must be null or
+  /// non-negative. Typically, [pressElevation] is greater than [elevation].
   const InputChip({
     Key key,
     this.avatar,
@@ -748,7 +754,7 @@ class InputChip extends StatelessWidget
 ///  * [CircleAvatar], which shows images or initials of people.
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 class ChoiceChip extends StatelessWidget
     implements
         ChipAttributes,
@@ -756,7 +762,9 @@ class ChoiceChip extends StatelessWidget
         DisabledChipAttributes {
   /// Create a chip that acts like a radio button.
   ///
-  /// The [label], [selected], and [clipBehavior] attributes must not be null.
+  /// The [label], [selected], and [clipBehavior] arguments must not be null.
+  /// The [pressElevation] and [elevation] must be null or non-negative.
+  /// Typically, [pressElevation] is greater than [elevation].
   const ChoiceChip({
     Key key,
     this.avatar,
@@ -929,7 +937,7 @@ class ChoiceChip extends StatelessWidget
 ///  * [CircleAvatar], which shows images or initials of people.
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 class FilterChip extends StatelessWidget
     implements
         ChipAttributes,
@@ -937,7 +945,9 @@ class FilterChip extends StatelessWidget
         DisabledChipAttributes {
   /// Create a chip that acts like a checkbox.
   ///
-  /// The [selected] and [label] attributes must not be null.
+  /// The [selected], [label], and [clipBehavior] arguments must not be null.
+  /// The [pressElevation] and [elevation] must be null or non-negative.
+  /// Typically, [pressElevation] is greater than [elevation].
   const FilterChip({
     Key key,
     this.avatar,
@@ -1068,11 +1078,13 @@ class FilterChip extends StatelessWidget
 ///  * [CircleAvatar], which shows images or initials of people.
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 class ActionChip extends StatelessWidget implements ChipAttributes, TappableChipAttributes {
   /// Create a chip that acts like a button.
   ///
-  /// The [label], [onPressed], and [clipBehavior] arguments must not be null.
+  /// The [label], [onPressed] and [clipBehavior] arguments must not be null.
+  /// The [pressElevation] and [elevation] must be null or non-negative.
+  /// Typically, [pressElevation] is greater than [elevation].
   const ActionChip({
     Key key,
     this.avatar,
@@ -1628,7 +1640,7 @@ class _RenderChipRedirectingHitDetection extends RenderConstrainedBox {
   _RenderChipRedirectingHitDetection(BoxConstraints additionalConstraints) : super(additionalConstraints: additionalConstraints);
 
   @override
-  bool hitTest(HitTestResult result, {Offset position}) {
+  bool hitTest(HitTestResult result, { Offset position }) {
     if (!size.contains(position))
       return false;
     // Only redirects hit detection which occurs above and below the render object.
@@ -1649,8 +1661,8 @@ class _ChipRenderWidget extends RenderObjectWidget {
     this.deleteDrawerAnimation,
     this.enableAnimation,
     this.avatarBorder,
-  })  : assert(theme != null),
-        super(key: key);
+  }) : assert(theme != null),
+       super(key: key);
 
   final _ChipRenderTheme theme;
   final bool value;
@@ -1878,10 +1890,10 @@ class _RenderChip extends RenderBox {
     this.deleteDrawerAnimation,
     this.enableAnimation,
     this.avatarBorder,
-  })  : assert(theme != null),
-        assert(textDirection != null),
-        _theme = theme,
-        _textDirection = textDirection {
+  }) : assert(theme != null),
+       assert(textDirection != null),
+       _theme = theme,
+       _textDirection = textDirection {
     checkmarkAnimation.addListener(markNeedsPaint);
     avatarDrawerAnimation.addListener(markNeedsLayout);
     deleteDrawerAnimation.addListener(markNeedsLayout);
@@ -2146,7 +2158,7 @@ class _RenderChip extends RenderBox {
   }
 
   @override
-  bool hitTest(HitTestResult result, {Offset position}) {
+  bool hitTest(HitTestResult result, { Offset position }) {
     if (!size.contains(position))
       return false;
     RenderBox hitTestChild;

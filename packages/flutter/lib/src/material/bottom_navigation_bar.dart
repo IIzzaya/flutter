@@ -28,20 +28,18 @@ const double _kBottomMargin = 8.0;
 ///
 ///  * [BottomNavigationBar]
 ///  * [BottomNavigationBarItem]
-///  * <https://material.google.com/components/bottom-navigation.html#bottom-navigation-specs>
+///  * <https://material.io/design/components/bottom-navigation.html#specs>
 enum BottomNavigationBarType {
-  /// The [BottomNavigationBar]'s [BottomNavigationBarItem]s have fixed width, always
-  /// display their text labels, and do not shift when tapped.
+  /// The [BottomNavigationBar]'s [BottomNavigationBarItem]s have fixed width.
   fixed,
 
   /// The location and size of the [BottomNavigationBar] [BottomNavigationBarItem]s
-  /// animate and labels fade in when they are tapped. Only the selected item
-  /// displays its text label.
+  /// animate and labels fade in when they are tapped.
   shifting,
 }
 
-/// A material widget displayed at the bottom of an app for selecting among a
-/// small number of views, typically between three and five.
+/// A material widget that's displayed at the bottom of an app for selecting
+/// among a small number of views, typically between three and five.
 ///
 /// The bottom navigation bar consists of multiple items in the form of
 /// text labels, icons, or both, laid out on top of a piece of material. It
@@ -52,94 +50,117 @@ enum BottomNavigationBarType {
 /// where it is provided as the [Scaffold.bottomNavigationBar] argument.
 ///
 /// The bottom navigation bar's [type] changes how its [items] are displayed.
-/// If not specified it's automatically set to [BottomNavigationBarType.fixed]
-/// when there are less than four items, [BottomNavigationBarType.shifting]
-/// otherwise.
+/// If not specified, then it's automatically set to
+/// [BottomNavigationBarType.fixed] when there are less than four items, and
+/// [BottomNavigationBarType.shifting] otherwise.
 ///
 ///  * [BottomNavigationBarType.fixed], the default when there are less than
-///    four [items]. The selected item is rendered with [fixedColor] if it's
-///    non-null, otherwise the theme's [ThemeData.primaryColor] is used. The
-///    navigation bar's background color is the default [Material] background
+///    four [items]. The selected item is rendered with the
+///    [selectedItemColor] if it's non-null, otherwise the theme's
+///    [ThemeData.primaryColor] is used. If [backgroundColor] is null, The
+///    navigation bar's background color defaults to the [Material] background
 ///    color, [ThemeData.canvasColor] (essentially opaque white).
 ///  * [BottomNavigationBarType.shifting], the default when there are four
-///    or more [items]. All items are rendered in white and the navigation bar's
-///    background color is the same as the
+///    or more [items]. If [selectedItemColor] is null, all items are rendered
+///    in white. The navigation bar's background color is the same as the
 ///    [BottomNavigationBarItem.backgroundColor] of the selected item. In this
 ///    case it's assumed that each item will have a different background color
 ///    and that background color will contrast well with white.
 ///
-/// ## Sample Code
-///
+/// {@tool snippet --template=stateful_widget_material}
 /// This example shows a [BottomNavigationBar] as it is used within a [Scaffold]
 /// widget. The [BottomNavigationBar] has three [BottomNavigationBarItem]
-/// widgets and the [currentIndex] is set to index 1. The color of the selected
-/// item is set to  a purple color. A function is called whenever any item is
-/// tapped and the function helps display the appropriate [Text] in the body of
-/// the [Scaffold].
+/// widgets and the [currentIndex] is set to index 0. The selected item is
+/// amber. The `_onItemTapped` function changes the selected item's index
+/// and displays a corresponding message in the center of the [Scaffold].
+///
+/// ![A scaffold with a bottom navigation bar containing three bottom navigation
+/// bar items. The first one is selected.](https://flutter.github.io/assets-for-api-docs/assets/material/bottom_navigation_bar.png)
 ///
 /// ```dart
-/// class MyHomePage extends StatefulWidget {
-///   MyHomePage({Key key}) : super(key: key);
+/// int _selectedIndex = 0;
+/// static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+/// static const List<Widget> _widgetOptions = <Widget>[
+///   Text(
+///     'Index 0: Home',
+///     style: optionStyle,
+///   ),
+///   Text(
+///      'Index 1: Business',
+///      style: optionStyle,
+///   ),
+///   Text(
+///      'Index 2: School',
+///      style: optionStyle,
+///   ),
+/// ];
 ///
-///   @override
-///   _MyHomePageState createState() => _MyHomePageState();
+/// void _onItemTapped(int index) {
+///   setState(() {
+///     _selectedIndex = index;
+///   });
 /// }
 ///
-/// class _MyHomePageState extends State<MyHomePage> {
-///   int _selectedIndex = 1;
-///   final _widgetOptions = [
-///     Text('Index 0: Home'),
-///     Text('Index 1: Business'),
-///     Text('Index 2: School'),
-///   ];
-///
-///   @override
-///   Widget build(BuildContext context) {
-///     return Scaffold(
-///       appBar: AppBar(
-///         title: Text('BottomNavigationBar Sample'),
-///       ),
-///       body: Center(
-///         child: _widgetOptions.elementAt(_selectedIndex),
-///       ),
-///       bottomNavigationBar: BottomNavigationBar(
-///         items: <BottomNavigationBarItem>[
-///           BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
-///           BottomNavigationBarItem(icon: Icon(Icons.business), title: Text('Business')),
-///           BottomNavigationBarItem(icon: Icon(Icons.school), title: Text('School')),
-///         ],
-///         currentIndex: _selectedIndex,
-///         fixedColor: Colors.deepPurple,
-///         onTap: _onItemTapped,
-///       ),
-///     );
-///   }
-///
-///   void _onItemTapped(int index) {
-///     setState(() {
-///       _selectedIndex = index;
-///     });
-///   }
+/// @override
+/// Widget build(BuildContext context) {
+///   return Scaffold(
+///     appBar: AppBar(
+///       title: const Text('BottomNavigationBar Sample'),
+///     ),
+///     body: Center(
+///       child: _widgetOptions.elementAt(_selectedIndex),
+///     ),
+///     bottomNavigationBar: BottomNavigationBar(
+///       items: const <BottomNavigationBarItem>[
+///         BottomNavigationBarItem(
+///           icon: Icon(Icons.home),
+///           title: Text('Home'),
+///         ),
+///         BottomNavigationBarItem(
+///           icon: Icon(Icons.business),
+///           title: Text('Business'),
+///         ),
+///         BottomNavigationBarItem(
+///           icon: Icon(Icons.school),
+///           title: Text('School'),
+///         ),
+///       ],
+///       currentIndex: _selectedIndex,
+///       selectedItemColor: Colors.amber[800],
+///       onTap: _onItemTapped,
+///     ),
+///   );
 /// }
 /// ```
+/// {@end-tool}
 ///
 /// See also:
 ///
 ///  * [BottomNavigationBarItem]
 ///  * [Scaffold]
-///  * <https://material.google.com/components/bottom-navigation.html>
+///  * <https://material.io/design/components/bottom-navigation.html>
 class BottomNavigationBar extends StatefulWidget {
-  /// Creates a bottom navigation bar, typically used in a [Scaffold] where it
-  /// is provided as the [Scaffold.bottomNavigationBar] argument.
+  /// Creates a bottom navigation bar which is typically used as a
+  /// [Scaffold]'s [Scaffold.bottomNavigationBar] argument.
   ///
-  /// The length of [items] must be at least two and each item's icon and title must be not null.
+  /// The length of [items] must be at least two and each item's icon and title
+  /// must not be null.
   ///
   /// If [type] is null then [BottomNavigationBarType.fixed] is used when there
   /// are two or three [items], [BottomNavigationBarType.shifting] otherwise.
   ///
-  /// If [fixedColor] is null then the theme's primary color,
-  /// [ThemeData.primaryColor], is used. However if [BottomNavigationBar.type] is
-  /// [BottomNavigationBarType.shifting] then [fixedColor] is ignored.
+  /// The [iconSize], [selectedFontSize], [unselectedFontSize], and [elevation]
+  /// arguments must be non-null and non-negative.
+  ///
+  /// Only one of [selectedItemColor] and [fixedColor] can be specified. The
+  /// former is preferred, [fixedColor] only exists for the sake of
+  /// backwards compatibility.
+  ///
+  /// The [showSelectedLabels] argument must not be non-null.
+  ///
+  /// The [showUnselectedLabels] argument defaults to `true` if [type] is
+  /// [BottomNavigationBarType.fixed] and `false` if [type] is
+  /// [BottomNavigationBarType.shifting].
   BottomNavigationBar({
     Key key,
     @required this.items,
@@ -159,27 +180,27 @@ class BottomNavigationBar extends StatefulWidget {
        type = type ?? (items.length <= 3 ? BottomNavigationBarType.fixed : BottomNavigationBarType.shifting),
        super(key: key);
 
-  /// The interactive items laid out within the bottom navigation bar where each item has an icon and title.
+  /// Defines the appearance of the button items that are arrayed within the
+  /// bottom navigation bar.
   final List<BottomNavigationBarItem> items;
 
-  /// The callback that is called when a item is tapped.
+  /// Called when one of the [items] is tapped.
   ///
-  /// The widget creating the bottom navigation bar needs to keep track of the
-  /// current index and call `setState` to rebuild it with the newly provided
-  /// index.
+  /// The stateful widget that creates the bottom navigation bar needs to keep
+  /// track of the index of the selected [BottomNavigationBarItem] and call
+  /// `setState` to rebuild the bottom navigation bar with the new [currentIndex].
   final ValueChanged<int> onTap;
 
-  /// The index into [items] of the current active item.
+  /// The index into [items] for the current active [BottomNavigationBarItem].
   final int currentIndex;
 
   /// Defines the layout and behavior of a [BottomNavigationBar].
   ///
-  /// See documentation for [BottomNavigationBarType] for information on the meaning
-  /// of different types.
+  /// See documentation for [BottomNavigationBarType] for information on the
+  /// meaning of different types.
   final BottomNavigationBarType type;
 
-  /// The color of the selected item when bottom navigation bar is
-  /// [BottomNavigationBarType.fixed].
+  /// The value of [selectedItemColor].
   ///
   /// If [fixedColor] is null then the theme's primary color,
   /// [ThemeData.primaryColor], is used. However if [BottomNavigationBar.type] is
@@ -269,7 +290,7 @@ class _BottomNavigationTile extends StatelessWidget {
             ),
             Semantics(
               label: indexLabel,
-            )
+            ),
           ],
         ),
       ),

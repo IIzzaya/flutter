@@ -54,7 +54,7 @@ class _ToolbarContainerLayout extends SingleChildLayoutDelegate {
 }
 
 // TODO(eseidel): Toolbar needs to change size based on orientation:
-// http://material.google.com/layout/structure.html#structure-app-bar
+// https://material.io/design/components/app-bars-top.html#specs
 // Mobile Landscape: 48dp
 // Mobile Portrait: 56dp
 // Tablet/Desktop: 64dp
@@ -127,7 +127,7 @@ class _ToolbarContainerLayout extends SingleChildLayoutDelegate {
 ///  * [PopupMenuButton], to show a popup menu on the app bar, via [actions].
 ///  * [FlexibleSpaceBar], which is used with [flexibleSpace] when the app bar
 ///    can expand and collapse.
-///  * <https://material.google.com/layout/structure.html#structure-toolbars>
+///  * <https://material.io/design/components/app-bars-top.html>
 class AppBar extends StatefulWidget implements PreferredSizeWidget {
   /// Creates a material design app bar.
   ///
@@ -135,10 +135,10 @@ class AppBar extends StatefulWidget implements PreferredSizeWidget {
   /// and [automaticallyImplyLeading] must not be null. Additionally, if
   /// [elevation] is specified, it must be non-negative.
   ///
-  /// If [backgroundColor], [elevation], [brightness], [iconTheme], or
-  /// [textTheme] are null, their [AppBarTheme] values will be used. If the
-  /// corresponding [AppBarTheme] property is null, then the default specified
-  /// in the property's documentation will be used.
+  /// If [backgroundColor], [elevation], [brightness], [iconTheme],
+  /// [actionsIconTheme], or [textTheme] are null, then their [AppBarTheme]
+  /// values will be used. If the corresponding [AppBarTheme] property is null,
+  /// then the default specified in the property's documentation will be used.
   ///
   /// Typically used in the [Scaffold.appBar] property.
   AppBar({
@@ -228,30 +228,33 @@ class AppBar extends StatefulWidget implements PreferredSizeWidget {
   /// For less common operations, consider using a [PopupMenuButton] as the
   /// last action.
   ///
-  /// {@tool snippet --template=stateless_widget}
+  /// {@tool snippet --template=stateless_widget_material}
   ///
   /// This sample shows adding an action to an [AppBar] that opens a shopping cart.
   ///
   /// ```dart
-  /// Scaffold(
-  ///   appBar: AppBar(
-  ///     title: Text('Hello World'),
-  ///     actions: <Widget>[
-  ///       IconButton(
-  ///         icon: Icon(Icons.shopping_cart),
-  ///         tooltip: 'Open shopping cart',
-  ///         onPressed: () {
-  ///           // ...
-  ///         },
-  ///       ),
-  ///     ],
-  ///   ),
-  /// )
+  /// Widget build(BuildContext context) {
+  ///   return Scaffold(
+  ///     appBar: AppBar(
+  ///       title: Text('Ready, Set, Shop!'),
+  ///       actions: <Widget>[
+  ///         IconButton(
+  ///           icon: Icon(Icons.shopping_cart),
+  ///           tooltip: 'Open shopping cart',
+  ///           onPressed: () {
+  ///             // Implement navigation to shopping cart page here...
+  ///             print('Shopping cart opened.');
+  ///           },
+  ///         ),
+  ///       ],
+  ///     ),
+  ///   );
+  /// }
   /// ```
   /// {@end-tool}
   final List<Widget> actions;
 
-  /// This widget is stacked behind the toolbar and the tabbar. It's height will
+  /// This widget is stacked behind the toolbar and the tab bar. It's height will
   /// be the same as the app bar's overall height.
   ///
   /// A flexible space isn't actually flexible unless the [AppBar]'s container
@@ -277,7 +280,7 @@ class AppBar extends StatefulWidget implements PreferredSizeWidget {
   ///
   /// The value is non-negative.
   ///
-  /// If this property is null then [ThemeData.appBarTheme.elevation] is used,
+  /// If this property is null, then [ThemeData.appBarTheme.elevation] is used,
   /// if that is also null, the default value is 4, the appropriate elevation
   /// for app bars.
   final double elevation;
@@ -285,34 +288,34 @@ class AppBar extends StatefulWidget implements PreferredSizeWidget {
   /// The color to use for the app bar's material. Typically this should be set
   /// along with [brightness], [iconTheme], [textTheme].
   ///
-  /// If this property is null then [ThemeData.appBarTheme.color] is used,
-  /// if that is also null then [ThemeData.primaryColor] is used.
+  /// If this property is null, then [ThemeData.appBarTheme.color] is used,
+  /// if that is also null, then [ThemeData.primaryColor] is used.
   final Color backgroundColor;
 
   /// The brightness of the app bar's material. Typically this is set along
   /// with [backgroundColor], [iconTheme], [textTheme].
   ///
-  /// If this property is null then [ThemeData.appBarTheme.brightness] is used,
-  /// if that is also null then [ThemeData.primaryColorBrightness] is used.
+  /// If this property is null, then [ThemeData.appBarTheme.brightness] is used,
+  /// if that is also null, then [ThemeData.primaryColorBrightness] is used.
   final Brightness brightness;
 
   /// The color, opacity, and size to use for app bar icons. Typically this
   /// is set along with [backgroundColor], [brightness], [textTheme].
   ///
-  /// If this property is null then [ThemeData.appBarTheme.iconTheme] is used,
-  /// if that is also null then [ThemeData.primaryIconTheme] is used.
+  /// If this property is null, then [ThemeData.appBarTheme.iconTheme] is used,
+  /// if that is also null, then [ThemeData.primaryIconTheme] is used.
   final IconThemeData iconTheme;
 
   /// The typographic styles to use for text in the app bar. Typically this is
   /// set along with [brightness] [backgroundColor], [iconTheme].
   ///
-  /// If this property is null then [ThemeData.appBarTheme.textTheme] is used,
-  /// if that is also null then [ThemeData.primaryTextTheme] is used.
+  /// If this property is null, then [ThemeData.appBarTheme.textTheme] is used,
+  /// if that is also null, then [ThemeData.primaryTextTheme] is used.
   final TextTheme textTheme;
 
   /// Whether this app bar is being displayed at the top of the screen.
   ///
-  /// If true, the appbar's toolbar elements and [bottom] widget will be
+  /// If true, the app bar's toolbar elements and [bottom] widget will be
   /// padded on top by the height of the system status bar. The layout
   /// of the [flexibleSpace] is not affected by the [primary] property.
   final bool primary;
@@ -761,6 +764,8 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 /// common actions with [IconButton]s which are optionally followed by a
 /// [PopupMenuButton] for less common operations.
 ///
+/// {@youtube 560 315 https://www.youtube.com/watch?v=R9C5KMJKluE}
+///
 /// Sliver app bars are typically used as the first child of a
 /// [CustomScrollView], which lets the app bar integrate with the scroll view so
 /// that it can vary in height according to the scroll offset or float above the
@@ -829,7 +834,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 ///  * [PopupMenuButton], to show a popup menu on the app bar, via [actions].
 ///  * [FlexibleSpaceBar], which is used with [flexibleSpace] when the app bar
 ///    can expand and collapse.
-///  * <https://material.google.com/layout/structure.html#structure-toolbars>
+///  * <https://material.io/design/components/app-bars-top.html>
 class SliverAppBar extends StatefulWidget {
   /// Creates a material design app bar that can be placed in a [CustomScrollView].
   ///
@@ -922,7 +927,7 @@ class SliverAppBar extends StatefulWidget {
   /// {@end-tool}
   final List<Widget> actions;
 
-  /// This widget is stacked behind the toolbar and the tabbar. It's height will
+  /// This widget is stacked behind the toolbar and the tab bar. It's height will
   /// be the same as the app bar's overall height.
   ///
   /// Typically a [FlexibleSpaceBar]. See [FlexibleSpaceBar] for details.
@@ -941,7 +946,9 @@ class SliverAppBar extends StatefulWidget {
   /// The z-coordinate at which to place this app bar when it is above other
   /// content. This controls the size of the shadow below the app bar.
   ///
-  /// Defaults to 4, the appropriate elevation for app bars.
+  /// If this property is null, then [ThemeData.appBarTheme.elevation] is used,
+  /// if that is also null, the default value is 4, the appropriate elevation
+  /// for app bars.
   ///
   /// If [forceElevated] is false, the elevation is ignored when the app bar has
   /// no content underneath it. For example, if the app bar is [pinned] but no
@@ -963,25 +970,29 @@ class SliverAppBar extends StatefulWidget {
   /// The color to use for the app bar's material. Typically this should be set
   /// along with [brightness], [iconTheme], [textTheme].
   ///
-  /// Defaults to [ThemeData.primaryColor].
+  /// If this property is null, then [ThemeData.appBarTheme.color] is used,
+  /// if that is also null, then [ThemeData.primaryColor] is used.
   final Color backgroundColor;
 
   /// The brightness of the app bar's material. Typically this is set along
   /// with [backgroundColor], [iconTheme], [textTheme].
   ///
-  /// Defaults to [ThemeData.primaryColorBrightness].
+  /// If this property is null, then [ThemeData.appBarTheme.brightness] is used,
+  /// if that is also null, then [ThemeData.primaryColorBrightness] is used.
   final Brightness brightness;
 
   /// The color, opacity, and size to use for app bar icons. Typically this
   /// is set along with [backgroundColor], [brightness], [textTheme].
   ///
-  /// Defaults to [ThemeData.primaryIconTheme].
+  /// If this property is null, then [ThemeData.appBarTheme.iconTheme] is used,
+  /// if that is also null, then [ThemeData.primaryIconTheme] is used.
   final IconThemeData iconTheme;
 
   /// The typographic styles to use for text in the app bar. Typically this is
   /// set along with [brightness] [backgroundColor], [iconTheme].
   ///
-  /// Defaults to [ThemeData.primaryTextTheme].
+  /// If this property is null, then [ThemeData.appBarTheme.textTheme] is used,
+  /// if that is also null, then [ThemeData.primaryTextTheme] is used.
   final TextTheme textTheme;
 
   /// Whether this app bar is being displayed at the top of the screen.

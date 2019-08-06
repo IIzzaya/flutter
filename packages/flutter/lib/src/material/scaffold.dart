@@ -26,11 +26,11 @@ import 'snack_bar.dart';
 import 'theme.dart';
 
 // Examples can assume:
-// TabController tabController
+// TabController tabController;
 // void setState(VoidCallback fn) { }
-// String appBarTitle
-// int tabCount
-// TickerProvider tickerProvider
+// String appBarTitle;
+// int tabCount;
+// TickerProvider tickerProvider;
 
 const FloatingActionButtonLocation _kDefaultFloatingActionButtonLocation = FloatingActionButtonLocation.endFloat;
 const FloatingActionButtonAnimator _kDefaultFloatingActionButtonAnimator = FloatingActionButtonAnimator.scaling;
@@ -51,7 +51,7 @@ enum _ScaffoldSlot {
 /// The geometry of the [Scaffold] after all its contents have been laid out
 /// except the [FloatingActionButton].
 ///
-/// The [Scaffold] passes this prelayout geometry to its
+/// The [Scaffold] passes this pre-layout geometry to its
 /// [FloatingActionButtonLocation], which produces an [Offset] that the
 /// [Scaffold] uses to position the [FloatingActionButton].
 ///
@@ -220,7 +220,7 @@ class ScaffoldGeometry {
     final Rect scaledButton = Rect.lerp(
       floatingActionButtonArea.center & Size.zero,
       floatingActionButtonArea,
-      scaleFactor
+      scaleFactor,
     );
     return copyWith(floatingActionButtonArea: scaledButton);
   }
@@ -500,8 +500,7 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
       // If we start out with a child, have the child appear fully visible instead
       // of animating in.
       _currentController.value = 1.0;
-    }
-    else {
+    } else {
       // If we start without a child we update the geometry object with a
       // floating action button scale of 0, as it is not showing on the screen.
       _updateGeometryScale(0.0);
@@ -668,8 +667,7 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
 /// [ScaffoldState] for the current [BuildContext] via [Scaffold.of] and use the
 /// [ScaffoldState.showSnackBar] and [ScaffoldState.showBottomSheet] functions.
 ///
-/// {@tool snippet --template=stateful_widget}
-///
+/// {@tool snippet --template=stateful_widget_material}
 /// This example shows a [Scaffold] with an [AppBar], a [BottomAppBar] and a
 /// [FloatingActionButton]. The [body] is a [Text] placed in a [Center] in order
 /// to center the text within the [Scaffold] and the [FloatingActionButton] is
@@ -736,21 +734,21 @@ class _FloatingActionButtonTransitionState extends State<_FloatingActionButtonTr
 /// scaffold with a differently titled AppBar. It would be better to add a
 /// listener to the [TabController] that updates the AppBar.
 ///
-/// ## Sample Code
-///
+/// {@tool sample}
 /// Add a listener to the app's tab controller so that the [AppBar] title of the
 /// app's one and only scaffold is reset each time a new tab is selected.
 ///
 /// ```dart
-/// tabController = TabController(vsync: tickerProvider, length: tabCount)..addListener(() {
+/// TabController(vsync: tickerProvider, length: tabCount)..addListener(() {
 ///   if (!tabController.indexIsChanging) {
 ///     setState(() {
 ///       // Rebuild the enclosing scaffold with a new AppBar title
 ///       appBarTitle = 'Tab ${tabController.index}';
 ///     });
 ///   }
-/// });
+/// })
 /// ```
+/// {@end-tool}
 ///
 /// Although there are some use cases, like a presentation app that
 /// shows embedded flutter content, where nested scaffolds are
@@ -949,30 +947,68 @@ class Scaffold extends StatefulWidget {
 
   /// The state from the closest instance of this class that encloses the given context.
   ///
-  /// Typical usage is as follows:
+  /// {@tool snippet --template=freeform}
+  /// Typical usage of the [Scaffold.of] function is to call it from within the
+  /// `build` method of a child of a [Scaffold].
   ///
-  /// ```dart
-  /// @override
-  /// Widget build(BuildContext context) {
-  ///   return RaisedButton(
-  ///     child: Text('SHOW A SNACKBAR'),
-  ///     onPressed: () {
-  ///       Scaffold.of(context).showSnackBar(SnackBar(
-  ///         content: Text('Hello!'),
-  ///       ));
-  ///     },
-  ///   );
+  /// ```dart imports
+  /// import 'package:flutter/material.dart';
+  /// ```
+  ///
+  /// ```dart main
+  /// void main() => runApp(MyApp());
+  /// ```
+  ///
+  /// ```dart preamble
+  /// class MyApp extends StatelessWidget {
+  ///   // This widget is the root of your application.
+  ///   @override
+  ///   Widget build(BuildContext context) {
+  ///     return MaterialApp(
+  ///       title: 'Flutter Code Sample for Scaffold.of.',
+  ///       theme: ThemeData(
+  ///         primarySwatch: Colors.blue,
+  ///       ),
+  ///       home: Scaffold(
+  ///         body: MyScaffoldBody(),
+  ///         appBar: AppBar(title: Text('Scaffold.of Example')),
+  ///       ),
+  ///       color: Colors.white,
+  ///     );
+  ///   }
   /// }
   /// ```
   ///
+  /// ```dart
+  /// class MyScaffoldBody extends StatelessWidget {
+  ///   @override
+  ///   Widget build(BuildContext context) {
+  ///     return Center(
+  ///       child: RaisedButton(
+  ///         child: Text('SHOW A SNACKBAR'),
+  ///         onPressed: () {
+  ///           Scaffold.of(context).showSnackBar(
+  ///             SnackBar(
+  ///               content: Text('Have a snack!'),
+  ///             ),
+  ///           );
+  ///         },
+  ///       ),
+  ///     );
+  ///   }
+  /// }
+  /// ```
+  /// {@end-tool}
+  ///
+  /// {@tool snippet --template=stateless_widget_material}
   /// When the [Scaffold] is actually created in the same `build` function, the
   /// `context` argument to the `build` function can't be used to find the
-  /// [Scaffold] (since it's "above" the widget being returned). In such cases,
-  /// the following technique with a [Builder] can be used to provide a new
-  /// scope with a [BuildContext] that is "under" the [Scaffold]:
+  /// [Scaffold] (since it's "above" the widget being returned in the widget
+  /// tree). In such cases, the following technique with a [Builder] can be used
+  /// to provide a new scope with a [BuildContext] that is "under" the
+  /// [Scaffold]:
   ///
   /// ```dart
-  /// @override
   /// Widget build(BuildContext context) {
   ///   return Scaffold(
   ///     appBar: AppBar(
@@ -987,7 +1023,7 @@ class Scaffold extends StatefulWidget {
   ///             child: Text('SHOW A SNACKBAR'),
   ///             onPressed: () {
   ///               Scaffold.of(context).showSnackBar(SnackBar(
-  ///                 content: Text('Hello!'),
+  ///                 content: Text('Have a snack!'),
   ///               ));
   ///             },
   ///           ),
@@ -997,6 +1033,7 @@ class Scaffold extends StatefulWidget {
   ///   );
   /// }
   /// ```
+  /// {@end-tool}
   ///
   /// A more efficient solution is to split your build function into several
   /// widgets. This introduces a new context from which you can obtain the
@@ -1231,7 +1268,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
         assert(_snackBars.first == controller);
         hideCurrentSnackBar(reason: SnackBarClosedReason.hide);
       },
-      null // SnackBar doesn't use a builder function so setState() wouldn't rebuild it
+      null, // SnackBar doesn't use a builder function so setState() wouldn't rebuild it
     );
     setState(() {
       _snackBars.addLast(controller);
@@ -1366,7 +1403,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
           });
         }
       },
-      builder: builder
+      builder: builder,
     );
 
     if (isLocalHistoryEntry)
@@ -1715,7 +1752,7 @@ class ScaffoldState extends State<Scaffold> with TickerProviderStateMixin {
               child: SafeArea(
                 top: false,
                 child: ButtonBar(
-                  children: widget.persistentFooterButtons
+                  children: widget.persistentFooterButtons,
                 ),
               ),
             ),
@@ -1864,7 +1901,7 @@ class _PersistentBottomSheet extends StatefulWidget {
     this.enableDrag = true,
     this.onClosing,
     this.onDismissed,
-    this.builder
+    this.builder,
   }) : super(key: key);
 
   final AnimationController animationController; // we control it, but it must be disposed by whoever created it
@@ -1909,7 +1946,7 @@ class _PersistentBottomSheetState extends State<_PersistentBottomSheet> {
         return Align(
           alignment: AlignmentDirectional.topStart,
           heightFactor: widget.animationController.value,
-          child: child
+          child: child,
         );
       },
       child: Semantics(
@@ -1922,9 +1959,9 @@ class _PersistentBottomSheetState extends State<_PersistentBottomSheet> {
           animationController: widget.animationController,
           enableDrag: widget.enableDrag,
           onClosing: widget.onClosing,
-          builder: widget.builder
-        )
-      )
+          builder: widget.builder,
+        ),
+      ),
     );
   }
 

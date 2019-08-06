@@ -21,12 +21,21 @@ import 'theme_data.dart';
 /// [SliderTheme.of]. When a widget uses [SliderTheme.of], it is automatically
 /// rebuilt if the theme later changes.
 ///
+/// The slider is as big as the largest of
+/// the [SliderComponentShape.getPreferredSize] of the thumb shape,
+/// the [SliderComponentShape.getPreferredSize] of the overlay shape,
+/// and the [SliderTickMarkShape.getPreferredSize] of the tick mark shape
+///
 /// See also:
 ///
 ///  * [SliderThemeData], which describes the actual configuration of a slider
 ///    theme.
 ///  * [SliderComponentShape], which can be used to create custom shapes for
-///    the slider thumb and value indicator.
+///    the slider thumb, overlay, and value indicator.
+///  * [SliderTrackShape], which can be used to create custom shapes for the
+///    slider track.
+///  * [SliderTickMarkShape], which can be used to create custom shapes for the
+///    slider tick marks.
 class SliderTheme extends InheritedWidget {
   /// Applies the given theme [data] to [child].
   ///
@@ -35,9 +44,9 @@ class SliderTheme extends InheritedWidget {
     Key key,
     @required this.data,
     @required Widget child,
-  })  : assert(child != null),
-        assert(data != null),
-        super(key: key, child: child);
+  }) : assert(child != null),
+       assert(data != null),
+       super(key: key, child: child);
 
   /// Specifies the color and shape values for descendant slider widgets.
   final SliderThemeData data;
@@ -123,8 +132,14 @@ enum ShowValueIndicator {
 ///  * The "thumb", which is a shape that slides horizontally when the user
 ///    drags it.
 ///  * The "track", which is the line that the slider thumb slides along.
-///  * The "value indicator", which is a shape that pops up when the user
-///    is dragging the thumb to indicate the value being selected.
+///  * The "tick marks", which are regularly spaced marks that are drawn when
+///    using discrete divisions.
+///  * The "value indicator", which appears when the user is dragging the thumb
+///    to indicate the value being selected.
+///  * The "overlay", which appears around the thumb, and is shown when the
+///    thumb is pressed, focused, or hovered. It is painted underneath the
+///    thumb, so it must extend beyond the bounds of the thumb itself to
+///    actually be visible.
 ///  * The "active" side of the slider is the side between the thumb and the
 ///    minimum value.
 ///  * The "inactive" side of the slider is the side between the thumb and the
@@ -132,10 +147,22 @@ enum ShowValueIndicator {
 ///  * The [Slider] is disabled when it is not accepting user input. See
 ///    [Slider] for details on when this happens.
 ///
-/// The thumb and the value indicator may have their shapes and behavior
-/// customized by creating your own [SliderComponentShape] that does what
-/// you want. See [RoundSliderThumbShape] and
-/// [PaddleSliderValueIndicatorShape] for examples.
+/// The thumb, track, tick marks, value indicator, and overlay can be customized
+/// by creating subclasses of [SliderTrackShape],
+/// [SliderComponentShape], and/or [SliderTickMarkShape]. See
+/// [RoundSliderThumbShape], [RectangularSliderTrackShape],
+/// [RoundSliderTickMarkShape], [PaddleSliderValueIndicatorShape], and
+/// [RoundSliderOverlayShape] for examples.
+///
+/// The track painting can be skipped by specifying 0 for [trackHeight].
+/// The thumb painting can be skipped by specifying
+/// [SliderComponentShape.noThumb] for [SliderThemeData.thumbShape].
+/// The overlay painting can be skipped by specifying
+/// [SliderComponentShape.noOverlay] for [SliderThemeData.overlayShape].
+/// The tick mark painting can be skipped by specifying
+/// [SliderTickMarkShape.noTickMark] for [SliderThemeData.tickMarkShape].
+/// The value indicator painting can be skipped by specifying the
+/// appropriate [ShowValueIndicator] for [SliderThemeData.showValueIndicator].
 ///
 /// See also:
 ///
@@ -144,7 +171,9 @@ enum ShowValueIndicator {
 ///  * [Theme] widget, which performs a similar function to [SliderTheme],
 ///    but for overall themes.
 ///  * [ThemeData], which has a default [SliderThemeData].
+///  * [SliderTrackShape], to define custom slider track shapes.
 ///  * [SliderComponentShape], to define custom slider component shapes.
+///  * [SliderTickMarkShape], to define custom slider tick mark shapes.
 class SliderThemeData extends Diagnosticable {
   /// Create a [SliderThemeData] given a set of exact values. All the values
   /// must be specified.

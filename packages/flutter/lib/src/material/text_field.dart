@@ -66,9 +66,25 @@ typedef InputCounterWidgetBuilder = Widget Function(
 /// To integrate the [TextField] into a [Form] with other [FormField] widgets,
 /// consider using [TextFormField].
 ///
+/// {@tool sample}
+/// This example shows how to create a [TextField] that will obscure input. The
+/// [InputDecoration] surrounds the field in a border using [OutlineInputBorder]
+/// and adds a label.
+///
+/// ```dart
+/// TextField(
+///   obscureText: true,
+///   decoration: InputDecoration(
+///     border: OutlineInputBorder(),
+///     labelText: 'Password',
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
-///  * <https://material.google.com/components/text-fields.html>
+///  * <https://material.io/design/components/text-fields.html>
 ///  * [TextFormField], which integrates with the [Form] widget.
 ///  * [InputDecorator], which shows the labels and other visual elements that
 ///    surround the actual text editing widget.
@@ -259,7 +275,7 @@ class TextField extends StatefulWidget {
   ///
   /// If set, a character counter will be displayed below the
   /// field showing how many characters have been entered. If set to a number
-  /// greather than 0, it will also display the maximum number allowed. If set
+  /// greater than 0, it will also display the maximum number allowed. If set
   /// to [TextField.noMaxLength] then only the current character count is displayed.
   ///
   /// After [maxLength] characters have been input, additional input

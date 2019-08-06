@@ -53,7 +53,7 @@ enum MaterialType {
 ///
 ///  * [MaterialType]
 ///  * [Material]
-final Map<MaterialType, BorderRadius> kMaterialEdges = <MaterialType, BorderRadius> {
+final Map<MaterialType, BorderRadius> kMaterialEdges = <MaterialType, BorderRadius>{
   MaterialType.canvas: null,
   MaterialType.card: BorderRadius.circular(2.0),
   MaterialType.circle: null,
@@ -149,14 +149,15 @@ abstract class MaterialInkController {
 ///
 /// See also:
 ///
-///  * [MergeableMaterial], a piece of material that can split and remerge.
+///  * [MergeableMaterial], a piece of material that can split and re-merge.
 ///  * [Card], a wrapper for a [Material] of [type] [MaterialType.card].
-///  * <https://material.google.com/>
+///  * <https://material.io/design/>
 class Material extends StatefulWidget {
   /// Creates a piece of material.
   ///
-  /// The [type], [elevation], [shadowColor], and [animationDuration] arguments
-  /// must not be null. Additionally, [elevation] must be non-negative.
+  /// The [type], [elevation], [shadowColor], [borderOnForeground] and
+  /// [animationDuration] arguments must not be null. Additionally, [elevation]
+  /// must be non-negative.
   ///
   /// If a [shape] is specified, then the [borderRadius] property must be
   /// null and the [type] property must not be [MaterialType.circle]. If the
@@ -248,7 +249,9 @@ class Material extends StatefulWidget {
   /// The default value is [kThemeChangeDuration].
   final Duration animationDuration;
 
-  /// If non-null, the corners of this box are rounded by this [BorderRadius].
+  /// If non-null, the corners of this box are rounded by this
+  /// [BorderRadiusGeometry] value.
+  ///
   /// Otherwise, the corners specified for the current [type] of material are
   /// used.
   ///
@@ -314,7 +317,7 @@ class _MaterialState extends State<Material> with TickerProviderStateMixin {
       contents = AnimatedDefaultTextStyle(
         style: widget.textStyle ?? Theme.of(context).textTheme.body1,
         duration: widget.animationDuration,
-        child: contents
+        child: contents,
       );
     }
     contents = NotificationListener<LayoutChangedNotification>(
@@ -328,7 +331,7 @@ class _MaterialState extends State<Material> with TickerProviderStateMixin {
         color: backgroundColor,
         child: contents,
         vsync: this,
-      )
+      ),
     );
 
     // PhysicalModel has a temporary workaround for a performance issue that
@@ -600,7 +603,7 @@ class ShapeBorderTween extends Tween<ShapeBorder> {
   ///
   /// the [begin] and [end] properties may be null; see [ShapeBorder.lerp] for
   /// the null handling semantics.
-  ShapeBorderTween({ShapeBorder begin, ShapeBorder end}): super(begin: begin, end: end);
+  ShapeBorderTween({ShapeBorder begin, ShapeBorder end}) : super(begin: begin, end: end);
 
   /// Returns the value this tween has at the given animation clock value.
   @override

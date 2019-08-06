@@ -644,7 +644,7 @@ class _RenderDecoration extends RenderBox {
   }
 
   // The returned list is ordered for hit testing.
-  Iterable<RenderBox> get _children sync *{
+  Iterable<RenderBox> get _children sync* {
     if (icon != null)
       yield icon;
     if (input != null)
@@ -746,8 +746,9 @@ class _RenderDecoration extends RenderBox {
       // label from changing when text is entered.
       final RenderProxyBox typedHint = hint;
       visitor(typedHint.child);
-    } else if (!isFocused && label != null)
+    } else if (!isFocused && label != null) {
       visitor(label);
+    }
     if (input != null)
       visitor(input);
     if (suffixIcon != null)
@@ -2183,7 +2184,7 @@ class InputDecoration {
   /// To create a collapsed input decoration, use [InputDecoration..collapsed].
   final bool isCollapsed;
 
-  /// An icon that that appears before the [prefix] or [prefixText] and before
+  /// An icon that appears before the [prefix] or [prefixText] and before
   /// the editable part of the text field, within the decoration's container.
   ///
   /// The size and color of the prefix icon is configured automatically using an
@@ -2257,7 +2258,7 @@ class InputDecoration {
   ///  * [suffixStyle], the equivalent but on the trailing edge.
   final TextStyle prefixStyle;
 
-  /// An icon that that appears after the editable part of the text field and
+  /// An icon that appears after the editable part of the text field and
   /// after the [suffix] or [suffixText], within the decoration's container.
   ///
   /// The size and color of the suffix icon is configured automatically using an
@@ -2268,7 +2269,7 @@ class InputDecoration {
   /// can be expanded beyond that. Anything larger than 24px will require
   /// additional padding to ensure it matches the material spec of 12px padding
   /// between the right edge of the input and trailing edge of the prefix icon.
-  /// The following snipped shows how to pad the trailing edge of the suffix
+  /// The following snippet shows how to pad the trailing edge of the suffix
   /// icon:
   ///
   /// ```dart
@@ -2541,7 +2542,7 @@ class InputDecoration {
   /// If provided, this replaces the semantic label of the [counterText].
   final String semanticCounterText;
 
-  /// Typically set to true when the [InputDecorator] contains a multiline
+  /// Typically set to true when the [InputDecorator] contains a multi-line
   /// [TextField] ([TextField.maxLines] is null or > 1) to override the default
   /// behavior of aligning the label with the center of the [TextField].
   ///
@@ -3135,7 +3136,7 @@ class InputDecorationTheme extends Diagnosticable {
   ///    rounded rectangle around the input decorator's container.
   final InputBorder border;
 
-  /// Typically set to true when the [InputDecorator] contains a multiline
+  /// Typically set to true when the [InputDecorator] contains a multi-line
   /// [TextField] ([TextField.maxLines] is null or > 1) to override the default
   /// behavior of aligning the label with the center of the [TextField].
   final bool alignLabelWithHint;

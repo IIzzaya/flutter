@@ -37,7 +37,7 @@ enum CollapseMode {
 ///
 ///  * [SliverAppBar], which implements the expanding and contracting.
 ///  * [AppBar], which is used by [SliverAppBar].
-///  * <https://material.google.com/patterns/scrolling-techniques.html>
+///  * <https://material.io/design/components/app-bars-top.html#behavior>
 class FlexibleSpaceBar extends StatefulWidget {
   /// Creates a flexible space bar.
   ///
@@ -63,7 +63,8 @@ class FlexibleSpaceBar extends StatefulWidget {
 
   /// Whether the title should be centered.
   ///
-  /// Defaults to being adapted to the current [TargetPlatform].
+  /// By default this property is true if the current target platform
+  /// is [TargetPlatform.iOS], false otherwise.
   final bool centerTitle;
 
   /// Collapse effect while scrolling.
@@ -178,8 +179,8 @@ class _FlexibleSpaceBarState extends State<FlexibleSpaceBar> {
           height: settings.maxExtent,
           child: Opacity(
             opacity: opacity,
-            child: widget.background
-          )
+            child: widget.background,
+          ),
         ));
       }
     }
@@ -223,9 +224,9 @@ class _FlexibleSpaceBarState extends State<FlexibleSpaceBar> {
               child: DefaultTextStyle(
                 style: titleStyle,
                 child: title,
-              )
-            )
-          )
+              ),
+            ),
+          ),
         ));
       }
     }
@@ -251,8 +252,8 @@ class FlexibleSpaceBarSettings extends InheritedWidget {
     this.maxExtent,
     @required this.currentExtent,
     @required Widget child,
-  }) :  assert(currentExtent != null),
-        super(key: key, child: child);
+  }) : assert(currentExtent != null),
+       super(key: key, child: child);
 
   /// Affects how transparent the text within the toolbar appears.
   final double toolbarOpacity;

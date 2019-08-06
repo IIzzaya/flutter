@@ -69,7 +69,7 @@ const TextStyle _errorTextStyle = TextStyle(
 ///  * [MaterialPageRoute], which defines an app page that transitions in a material-specific way.
 ///  * [WidgetsApp], which defines the basic app elements but does not depend on the material library.
 ///  * The Flutter Internationalization Tutorial,
-///    <https://flutter.io/tutorials/internationalization/>.
+///    <https://flutter.dev/tutorials/internationalization/>.
 class MaterialApp extends StatefulWidget {
   /// Creates a MaterialApp.
   ///
@@ -163,7 +163,21 @@ class MaterialApp extends StatefulWidget {
   /// This value is passed unmodified to [WidgetsApp.onGenerateTitle].
   final GenerateAppTitle onGenerateTitle;
 
-  /// The colors to use for the application's widgets.
+  /// Default visual properties, like colors fonts and shapes, for this app's
+  /// material widgets.
+  ///
+  /// A second [darkTheme] [ThemeData] value, which is used when the underlying
+  /// platform requests a "dark mode" UI, can also be specified.
+  ///
+  /// The default value of this property is the value of [ThemeData.light()].
+  ///
+  /// See also:
+  ///
+  ///  * [MediaQueryData.platformBrightness], which indicates the platform's
+  ///    desired brightness and is used to automatically toggle between [theme]
+  ///    and [darkTheme] in [MaterialApp].
+  ///  * [ThemeData.brightness], which indicates the [Brightness] of a theme's
+  ///    colors.
   final ThemeData theme;
 
   /// {@macro flutter.widgets.widgetsApp.color}
@@ -175,7 +189,7 @@ class MaterialApp extends StatefulWidget {
   /// {@macro flutter.widgets.widgetsApp.localizationsDelegates}
   ///
   /// Internationalized apps that require translations for one of the locales
-  /// listed in [GlobalMaterialLocalizations] should specify this paramter
+  /// listed in [GlobalMaterialLocalizations] should specify this parameter
   /// and list the [supportedLocales] that the application can handle.
   ///
   /// ```dart
@@ -262,7 +276,7 @@ class MaterialApp extends StatefulWidget {
   ///  * [GlobalMaterialLocalizations], a [localizationsDelegates] value
   ///    which provides material localizations for many languages.
   ///  * The Flutter Internationalization Tutorial,
-  ///    <https://flutter.io/tutorials/internationalization/>.
+  ///    <https://flutter.dev/tutorials/internationalization/>.
   final Iterable<LocalizationsDelegate<dynamic>> localizationsDelegates;
 
   /// {@macro flutter.widgets.widgetsApp.localeListResolutionCallback}
@@ -286,14 +300,14 @@ class MaterialApp extends StatefulWidget {
   ///  * [GlobalMaterialLocalizations], a [localizationsDelegates] value
   ///    which provides material localizations for many languages.
   ///  * The Flutter Internationalization Tutorial,
-  ///    <https://flutter.io/tutorials/internationalization/>.
+  ///    <https://flutter.dev/tutorials/internationalization/>.
   final Iterable<Locale> supportedLocales;
 
   /// Turns on a performance overlay.
   ///
   /// See also:
   ///
-  ///  * <https://flutter.io/debugging/#performanceoverlay>
+  ///  * <https://flutter.dev/debugging/#performanceoverlay>
   final bool showPerformanceOverlay;
 
   /// Turns on checkerboarding of raster cache images.
@@ -316,7 +330,7 @@ class MaterialApp extends StatefulWidget {
   ///
   /// See also:
   ///
-  ///  * <https://material.google.com/layout/metrics-keylines.html>
+  ///  * <https://material.io/design/layout/spacing-methods.html>
   final bool debugShowMaterialGrid;
 
   @override

@@ -53,7 +53,7 @@ enum TabBarIndicatorSize {
 ///  * [TabBar], which displays a row of tabs.
 ///  * [TabBarView], which displays a widget for the currently selected tab.
 ///  * [TabController], which coordinates tab selection between a [TabBar] and a [TabBarView].
-///  * <https://material.google.com/components/tabs.html>
+///  * <https://material.io/design/components/tabs.html>
 class Tab extends StatelessWidget {
   /// Creates a material design [TabBar] tab. At least one of [text], [icon],
   /// and [child] must be non-null. The [text] and [child] arguments must not be
@@ -108,8 +108,8 @@ class Tab extends StatelessWidget {
             child: icon,
             margin: const EdgeInsets.only(bottom: 10.0),
           ),
-          _buildLabelText()
-        ]
+          _buildLabelText(),
+        ],
       );
     }
 
@@ -637,8 +637,8 @@ class TabBar extends StatefulWidget implements PreferredSizeWidget {
   /// Unselected tab labels are rendered with the same color rendered at 70%
   /// opacity unless [unselectedLabelColor] is non-null.
   ///
-  /// If this parameter is null then the color of the theme's body2 text color
-  /// is used.
+  /// If this parameter is null then the color of the [ThemeData.primaryTextTheme]'s
+  /// body2 text color is used.
   final Color labelColor;
 
   /// The color of unselected tab labels.
@@ -651,8 +651,8 @@ class TabBar extends StatefulWidget implements PreferredSizeWidget {
   /// null then this text style will be used for both selected and unselected
   /// label styles.
   ///
-  /// If this property is null then the text style of the theme's body2
-  /// definition is used.
+  /// If this property is null then the text style of the [ThemeData.primaryTextTheme]'s
+  /// body2 definition is used.
   final TextStyle labelStyle;
 
   /// The padding added to each of the tab labels.
@@ -663,7 +663,8 @@ class TabBar extends StatefulWidget implements PreferredSizeWidget {
   /// The text style of the unselected tab labels
   ///
   /// If this property is null then the [labelStyle] value is used. If [labelStyle]
-  /// is null then the text style of the theme's body2 definition is used.
+  /// is null then the text style of the [ThemeData.primaryTextTheme]'s
+  /// body2 definition is used.
   final TextStyle unselectedLabelStyle;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
@@ -730,7 +731,10 @@ class _TabBarState extends State<TabBar> {
     // When that happens, automatic transitions of the theme will likely look
     // ugly as the indicator color suddenly snaps to white at one end, but it's
     // not clear how to avoid that any further.
-    if (color.value == Material.of(context).color.value)
+    //
+    // The material's color might be null (if it's a transparency). In that case
+    // there's no good way for us to find out what the color is so we don't.
+    if (color.value == Material.of(context).color?.value)
       color = Colors.white;
 
     return UnderlineTabIndicator(
@@ -1236,7 +1240,10 @@ class TabPageSelectorIndicator extends StatelessWidget {
     @required this.backgroundColor,
     @required this.borderColor,
     @required this.size,
-  }) : assert(backgroundColor != null), assert(borderColor != null), assert(size != null), super(key: key);
+  }) : assert(backgroundColor != null),
+       assert(borderColor != null),
+       assert(size != null),
+       super(key: key);
 
   /// The indicator circle's background color.
   final Color backgroundColor;
@@ -1275,7 +1282,8 @@ class TabPageSelector extends StatelessWidget {
     this.indicatorSize = 12.0,
     this.color,
     this.selectedColor,
-  }) : assert(indicatorSize != null && indicatorSize > 0.0), super(key: key);
+  }) : assert(indicatorSize != null && indicatorSize > 0.0),
+       super(key: key);
 
   /// This widget's selection and animation state.
   ///
@@ -1370,7 +1378,7 @@ class TabPageSelector extends StatelessWidget {
             }).toList(),
           ),
         );
-      }
+      },
     );
   }
 }
