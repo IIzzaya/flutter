@@ -104,7 +104,7 @@ class _TextSelectionToolbar extends StatelessWidget {
       size: _kToolbarTriangleSize,
       child: CustomPaint(
         painter: _TextSelectionToolbarNotchPainter(),
-      )
+      ),
     );
 
     return Column(
@@ -245,7 +245,7 @@ class _CupertinoTextSelectionControls extends TextSelectionControls {
           handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
           handleSelectAll: canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
         ),
-      )
+      ),
     );
   }
 
@@ -256,7 +256,7 @@ class _CupertinoTextSelectionControls extends TextSelectionControls {
     // padding in every direction that will constitute the selection drag area.
     final Size desiredSize = Size(
       2.0 * _kHandlesPadding,
-      textLineHeight + 2.0 * _kHandlesPadding
+      textLineHeight + 2.0 * _kHandlesPadding,
     );
 
     final Widget handle = SizedBox.fromSize(
@@ -281,16 +281,16 @@ class _CupertinoTextSelectionControls extends TextSelectionControls {
         return Transform(
           transform: Matrix4.rotationZ(math.pi)
               ..translate(-_kHandlesPadding, -_kHandlesPadding),
-          child: handle
+          child: handle,
         );
       case TextSelectionHandleType.right:
         return Transform(
           transform: Matrix4.translationValues(
             -_kHandlesPadding,
             -(textLineHeight + _kHandlesPadding),
-            0.0
+            0.0,
           ),
-          child: handle
+          child: handle,
         );
       case TextSelectionHandleType.collapsed: // iOS doesn't draw anything for collapsed selections.
         return Container();

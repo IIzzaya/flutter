@@ -44,7 +44,7 @@ const Tolerance _kFlingTolerance = Tolerance(
 /// Configures how an [AnimationController] behaves when animations are disabled.
 ///
 /// When [AccessibilityFeatures.disableAnimations] is true, the device is asking
-/// flutter to reduce or disable animations as much as possible. To honor this,
+/// Flutter to reduce or disable animations as much as possible. To honor this,
 /// we reduce the duration and the corresponding number of frames for animations.
 /// This enum is used to allow certain [AnimationController]s to opt out of this
 /// behavior.
@@ -209,7 +209,7 @@ class AnimationController extends Animation<double>
   with AnimationEagerListenerMixin, AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
   /// Creates an animation controller.
   ///
-  /// * [value] is the initial value of the animation. If defaults to the lower
+  /// * `value` is the initial value of the animation. If defaults to the lower
   ///   bound.
   ///
   /// * [duration] is the length of time this animation should last.
@@ -797,8 +797,8 @@ class _InterpolationSimulation extends Simulation {
 
 class _RepeatingSimulation extends Simulation {
   _RepeatingSimulation(double initialValue, this.min, this.max, this.reverse, Duration period)
-    : _periodInSeconds = period.inMicroseconds / Duration.microsecondsPerSecond,
-      _initialT = (max == min) ? 0.0 : (initialValue / (max - min)) * (period.inMicroseconds / Duration.microsecondsPerSecond) {
+      : _periodInSeconds = period.inMicroseconds / Duration.microsecondsPerSecond,
+        _initialT = (max == min) ? 0.0 : (initialValue / (max - min)) * (period.inMicroseconds / Duration.microsecondsPerSecond) {
     assert(_periodInSeconds > 0.0);
     assert(_initialT >= 0.0);
   }

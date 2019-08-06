@@ -64,6 +64,8 @@ class CupertinoSwitch extends StatefulWidget {
        super(key: key);
 
   /// Whether this switch is on or off.
+  ///
+  /// Must not be null.
   final bool value;
 
   /// Called when the user toggles with switch on or off.
@@ -72,7 +74,7 @@ class CupertinoSwitch extends StatefulWidget {
   /// change state until the parent widget rebuilds the switch with the new
   /// value.
   ///
-  /// If null, the switch will be displayed as disabled.
+  /// If null, the switch will be displayed as disabled, which has a reduced opacity.
   ///
   /// The callback provided to onChanged should update the state of the parent
   /// [StatefulWidget] using the [State.setState] method, so that the parent
@@ -96,7 +98,6 @@ class CupertinoSwitch extends StatefulWidget {
   /// [CupertinoTheme] in accordance to native iOS behavior.
   final Color activeColor;
 
-  // TODO(jslavitz): Set the DragStartBehavior default to be start across all widgets.
   /// {@template flutter.cupertino.switch.dragStartBehavior}
   /// Determines the way that drag start behavior is handled.
   ///
@@ -109,7 +110,7 @@ class CupertinoSwitch extends StatefulWidget {
   /// animation smoother and setting it to [DragStartBehavior.down] will make
   /// drag behavior feel slightly more reactive.
   ///
-  /// By default, the drag start behavior is [DragStartBehavior.down].
+  /// By default, the drag start behavior is [DragStartBehavior.start].
   ///
   /// See also:
   ///
@@ -165,7 +166,7 @@ class _CupertinoSwitchRenderObjectWidget extends LeafRenderObjectWidget {
       onChanged: onChanged,
       textDirection: Directionality.of(context),
       vsync: vsync,
-      dragStartBehavior: dragStartBehavior
+      dragStartBehavior: dragStartBehavior,
     );
   }
 
@@ -462,7 +463,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
         offset.dx + (size.width - _kTrackWidth) / 2.0,
         offset.dy + (size.height - _kTrackHeight) / 2.0,
         _kTrackWidth,
-        _kTrackHeight
+        _kTrackHeight,
     );
     final RRect outerRRect = RRect.fromRectAndRadius(trackRect, const Radius.circular(_kTrackRadius));
     final RRect innerRRect = RRect.fromRectAndRadius(trackRect.deflate(borderThickness), const Radius.circular(_kTrackRadius));

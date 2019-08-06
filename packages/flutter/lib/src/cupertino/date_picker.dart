@@ -583,8 +583,7 @@ class _CupertinoDatePickerDateTimeState extends State<CupertinoDatePicker> {
         || localizations.datePickerDateTimeOrder == DatePickerDateTimeOrder.time_dayPeriod_date) {
         pickerBuilders.add(_buildAmPmPicker);
         columnWidths.add(_getEstimatedColumnWidth(_PickerColumnType.dayPeriod));
-      }
-      else {
+      } else {
         pickerBuilders.insert(0, _buildAmPmPicker);
         columnWidths.insert(0, _getEstimatedColumnWidth(_PickerColumnType.dayPeriod));
       }
@@ -596,8 +595,7 @@ class _CupertinoDatePickerDateTimeState extends State<CupertinoDatePicker> {
           || localizations.datePickerDateTimeOrder == DatePickerDateTimeOrder.dayPeriod_time_date) {
         pickerBuilders.add(_buildMediumDatePicker);
         columnWidths.add(_getEstimatedColumnWidth(_PickerColumnType.date));
-      }
-      else {
+      } else {
         pickerBuilders.insert(0, _buildMediumDatePicker);
         columnWidths.insert(0, _getEstimatedColumnWidth(_PickerColumnType.date));
       }
@@ -1156,8 +1154,7 @@ class _CupertinoTimerPickerState extends State<CupertinoTimerPicker> {
               ),
             ),
           );
-        }
-        else
+        } else {
           return Semantics(
             label: semanticsLabel,
             excludeSemantics: true,
