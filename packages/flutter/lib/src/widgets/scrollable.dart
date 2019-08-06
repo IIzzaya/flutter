@@ -231,7 +231,8 @@ class Scrollable extends StatefulWidget {
 
   /// Scrolls the scrollables that enclose the given context so as to make the
   /// given context visible.
-  static Future<void> ensureVisible(BuildContext context, {
+  static Future<void> ensureVisible(
+    BuildContext context, {
     double alignment = 0.0,
     Duration duration = Duration.zero,
     Curve curve = Curves.ease,
@@ -265,7 +266,7 @@ class _ScrollableScope extends InheritedWidget {
     Key key,
     @required this.scrollable,
     @required this.position,
-    @required Widget child
+    @required Widget child,
   }) : assert(scrollable != null),
        assert(child != null),
        super(key: key, child: child);
@@ -594,8 +595,9 @@ class _ScrollSemantics extends SingleChildRenderObjectWidget {
     @required this.position,
     @required this.allowImplicitScrolling,
     @required this.semanticChildCount,
-    Widget child
-  }) : assert(position != null), super(key: key, child: child);
+    Widget child,
+  }) : assert(position != null),
+       super(key: key, child: child);
 
   final ScrollPosition position;
   final bool allowImplicitScrolling;
@@ -628,7 +630,8 @@ class _RenderScrollSemantics extends RenderProxyBox {
   }) : _position = position,
        _allowImplicitScrolling = allowImplicitScrolling,
        _semanticChildCount = semanticChildCount,
-       assert(position != null), super(child) {
+       assert(position != null),
+       super(child) {
     position.addListener(markNeedsSemanticsUpdate);
   }
 
@@ -697,9 +700,9 @@ class _RenderScrollSemantics extends RenderProxyBox {
     final List<SemanticsNode> included = <SemanticsNode>[];
     for (SemanticsNode child in children) {
       assert(child.isTagged(RenderViewport.useTwoPaneSemantics));
-      if (child.isTagged(RenderViewport.excludeFromScrolling))
+      if (child.isTagged(RenderViewport.excludeFromScrolling)) {
         excluded.add(child);
-      else {
+      } else {
         if (!child.hasFlag(SemanticsFlag.isHidden))
           firstVisibleIndex ??= child.indexInParent;
         included.add(child);

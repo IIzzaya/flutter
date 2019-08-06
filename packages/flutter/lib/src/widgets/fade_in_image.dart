@@ -22,6 +22,8 @@ import 'ticker_provider.dart';
 /// so that the image appears on screen with a graceful animation rather than
 /// abruptly pops onto the screen.
 ///
+/// {@youtube 560 315 https://www.youtube.com/watch?v=pK738Pg9cxc}
+///
 /// If the [image] emits an [ImageInfo] synchronously, such as when the image
 /// has been loaded and cached, the [image] is displayed immediately and the
 /// [placeholder] is never displayed.
@@ -66,6 +68,14 @@ class FadeInImage extends StatefulWidget {
   /// The [placeholder], [image], [fadeOutDuration], [fadeOutCurve],
   /// [fadeInDuration], [fadeInCurve], [alignment], [repeat], and
   /// [matchTextDirection] arguments must not be null.
+  ///
+  /// There are two different semantic label for the class.
+  /// [placeholderSemanticLabel] is used for defining a semantics label for
+  /// [placeholder]. [imageSemanticLabel] is used for defining a semantics label
+  /// for [image]
+  ///
+  /// If [excludeFromSemantics] is true, then [placeholderSemanticLabel] and
+  /// [imageSemanticLabel] will be ignored.
   const FadeInImage({
     Key key,
     @required this.placeholder,
@@ -332,7 +342,7 @@ class _ImageProviderResolver {
     final ImageStream oldImageStream = _imageStream;
     _imageStream = provider.resolve(createLocalImageConfiguration(
       state.context,
-      size: widget.width != null && widget.height != null ? Size(widget.width, widget.height) : null
+      size: widget.width != null && widget.height != null ? Size(widget.width, widget.height) : null,
     ));
     assert(_imageStream != null);
 

@@ -430,7 +430,7 @@ class ClampingScrollPhysics extends ScrollPhysics {
         position.pixels,
         end,
         math.min(0.0, velocity),
-        tolerance: tolerance
+        tolerance: tolerance,
       );
     }
     if (velocity.abs() < tolerance.velocity)

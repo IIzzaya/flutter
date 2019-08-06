@@ -52,6 +52,50 @@ const int _kObscureShowLatestCharCursorTicks = 3;
 /// text field. If you build a text field with a controller that already has
 /// [text], the text field will use that text as its initial value.
 ///
+/// The [text] or [selection] properties can be set from within a listener
+/// added to this controller. If both properties need to be changed then the
+/// controller's [value] should be set instead.
+///
+/// {@tool snippet --template=stateful_widget_material}
+/// This example creates a [TextField] with a [TextEditingController] whose
+/// change listener forces the entered text to be lower case and keeps the
+/// cursor at the end of the input.
+///
+/// ```dart
+/// final _controller = TextEditingController();
+///
+/// void initState() {
+///   _controller.addListener(() {
+///     final text = _controller.text.toLowerCase();
+///     _controller.value = _controller.value.copyWith(
+///       text: text,
+///       selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+///       composing: TextRange.empty,
+///     );
+///   });
+///   super.initState();
+/// }
+///
+/// void dispose() {
+///   _controller.dispose();
+///   super.dispose();
+/// }
+///
+/// Widget build(BuildContext context) {
+///   return Scaffold(
+///     body: Container(
+///      alignment: Alignment.center,
+///       padding: const EdgeInsets.all(6),
+///       child: TextFormField(
+///         controller: _controller,
+///        decoration: InputDecoration(border: OutlineInputBorder()),
+///       ),
+///     ),
+///   );
+/// }
+/// ```
+/// {@end-tool}
+///
 /// See also:
 ///
 ///  * [TextField], which is a Material Design text field that can be controlled
@@ -169,6 +213,16 @@ class TextEditingController extends ValueNotifier<TextEditingValue> {
 /// is a full-featured, material-design text input field with placeholder text,
 /// labels, and [Form] integration.
 ///
+/// ## Gesture Events Handling
+///
+/// This widget provides rudimentary, platform-agnostic gesture handling for
+/// user actions such as tapping, long-pressing and scrolling when
+/// [rendererIgnoresPointer] is false (false by default). To tightly conform
+/// to the platform behavior with respect to input gestures in text fields, use
+/// [TextField] or [CupertinoTextField]. For custom selection behavior, call
+/// methods such as [RenderEditable.selectPosition],
+/// [RenderEditable.selectWord], etc. programmatically.
+///
 /// See also:
 ///
 ///  * [TextField], which is a full-featured, material-design text input field
@@ -267,6 +321,30 @@ class EditableText extends StatefulWidget {
   /// The text style to use for the editable text.
   final TextStyle style;
 
+  /// {@template flutter.widgets.editableText.strutStyle}
+  /// The strut style used for the vertical layout.
+  ///
+  /// [StrutStyle] is used to establish a predictable vertical layout.
+  /// Since fonts may vary depending on user input and due to font
+  /// fallback, [StrutStyle.forceStrutHeight] is enabled by default
+  /// to lock all lines to the height of the base [TextStyle], provided by
+  /// [style]. This ensures the typed text fits within the allotted space.
+  ///
+  /// If null, the strut used will is inherit values from the [style] and will
+  /// have [StrutStyle.forceStrutHeight] set to true. When no [style] is
+  /// passed, the theme's [TextStyle] will be used to generate [strutStyle]
+  /// instead.
+  ///
+  /// To disable strut-based vertical alignment and allow dynamic vertical
+  /// layout based on the glyphs typed, use [StrutStyle.disabled].
+  ///
+  /// Flutter's strut is based on [typesetting strut](https://en.wikipedia.org/wiki/Strut_(typesetting))
+  /// and CSS's [line-height](https://www.w3.org/TR/CSS2/visudet.html#line-height).
+  /// {@endtemplate}
+  ///
+  /// Within editable text and textfields, [StrutStyle] will not use its standalone
+  /// default values, and will instead inherit omitted/null properties from the
+  /// [TextStyle] instead. See [StrutStyle.inheritFromTextStyle].
   /// {@template flutter.widgets.editableText.textAlign}
   /// How the text should be aligned horizontally.
   ///
@@ -348,14 +426,76 @@ class EditableText extends StatefulWidget {
   ///
   /// If this is null, there is no limit to the number of lines, and the text
   /// container will start with enough vertical space for one line and
-  /// automatically grow to accomodate additional lines as they are entered.
+  /// automatically grow to accommodate additional lines as they are entered.
   ///
-  /// If it is not null, the value must be greater than zero. If it is greater
-  /// than 1, it will take up enough horizontal space to accomodate that number
-  /// of lines.
+  /// If this is not null, the value must be greater than zero, and it will lock
+  /// the input to the given number of lines and take up enough horizontal space
+  /// to accommodate that number of lines. Setting [minLines] as well allows the
+  /// input to grow between the indicated range.
+  ///
+  /// The full set of behaviors possible with [minLines] and [maxLines] are as
+  /// follows. These examples apply equally to `TextField`, `TextFormField`, and
+  /// `EditableText`.
+  ///
+  /// Input that occupies a single line and scrolls horizontally as needed.
+  /// ```dart
+  /// TextField()
+  /// ```
+  ///
+  /// Input whose height grows from one line up to as many lines as needed for
+  /// the text that was entered. If a height limit is imposed by its parent, it
+  /// will scroll vertically when its height reaches that limit.
+  /// ```dart
+  /// TextField(maxLines: null)
+  /// ```
+  ///
+  /// The input's height is large enough for the given number of lines. If
+  /// additional lines are entered the input scrolls vertically.
+  /// ```dart
+  /// TextField(maxLines: 2)
+  /// ```
+  ///
+  /// Input whose height grows with content between a min and max. An infinite
+  /// max is possible with `maxLines: null`.
+  /// ```dart
+  /// TextField(minLines: 2, maxLines: 4)
+  /// ```
   /// {@endtemplate}
   final int maxLines;
 
+  /// {@template flutter.widgets.editableText.minLines}
+  /// The minimum number of lines to occupy when the content spans fewer lines.
+
+  /// When [maxLines] is set as well, the height will grow between the indicated
+  /// range of lines. When [maxLines] is null, it will grow as high as needed,
+  /// starting from [minLines].
+  ///
+  /// See the examples in [maxLines] for the complete picture of how [maxLines]
+  /// and [minLines] interact to produce various behaviors.
+  ///
+  /// Defaults to null.
+  /// {@endtemplate}
+  /// {@template flutter.widgets.editableText.expands}
+  /// Whether this widget's height will be sized to fill its parent.
+  ///
+  /// If set to true and wrapped in a parent widget like [Expanded] or
+  /// [SizedBox], the input will expand to fill the parent.
+  ///
+  /// [maxLines] and [minLines] must both be null when this is set to true,
+  /// otherwise an error is thrown.
+  ///
+  /// Defaults to false.
+  ///
+  /// See the examples in [maxLines] for the complete picture of how [maxLines],
+  /// [minLines], and [expands] interact to produce various behaviors.
+  ///
+  /// Input that matches the height of its parent
+  /// ```dart
+  /// Expanded(
+  ///   child: TextField(maxLines: null, expands: true),
+  /// )
+  /// ```
+  /// {@endtemplate}
   /// {@template flutter.widgets.editableText.autofocus}
   /// Whether this text field should focus itself if nothing else is already
   /// focused.
@@ -373,6 +513,19 @@ class EditableText extends StatefulWidget {
   final Color selectionColor;
 
   /// Optional delegate for building the text selection handles and toolbar.
+  ///
+  /// The [EditableText] widget used on its own will not trigger the display
+  /// of the selection toolbar by itself. The toolbar is shown by calling
+  /// [EditableTextState.showToolbar] in response to an appropriate user event.
+  ///
+  /// See also:
+  ///
+  ///  * [CupertinoTextField], which wraps an [EditableText] and which shows the
+  ///    selection toolbar upon user events that are appropriate on the iOS
+  ///    platform.
+  ///  * [TextField], a Material Design themed wrapper of [EditableText], which
+  ///    shows the selection toolbar upon appropriate user events based on the
+  ///    user's platform set in [ThemeData.platform].
   final TextSelectionControls selectionControls;
 
   /// {@template flutter.widgets.editableText.keyboardType}
@@ -390,7 +543,7 @@ class EditableText extends StatefulWidget {
   /// Called when the user initiates a change to the TextField's
   /// value: when they have inserted or deleted text.
   ///
-  /// This callback does run not when the TextField's text is changed
+  /// This callback doesn't run when the TextField's text is changed
   /// programmatically, via the TextField's [controller]. Typically it
   /// isn't necessary to be notified of such changes, since they're
   /// initiated by the app itself.
@@ -471,6 +624,15 @@ class EditableText extends StatefulWidget {
   /// {@endtemplate}
   final Radius cursorRadius;
 
+  /// Whether the cursor will animate from fully transparent to fully opaque
+  /// during each cursor blink.
+  ///
+  /// By default, the cursor opacity will animate on iOS platforms and will not
+  /// animate on Android platforms.
+
+  ///{@macro flutter.rendering.editable.cursorOffset}
+
+  ///{@macro flutter.rendering.editable.paintCursorOnTop}
   /// The appearance of the keyboard.
   ///
   /// This setting is only honored on iOS devices.
@@ -501,8 +663,12 @@ class EditableText extends StatefulWidget {
   /// {@endtemplate}
   final bool enableInteractiveSelection;
 
-  /// Setting this property to true makes the cursor stop blinking and stay visible on the screen continually.
-  /// This property is most useful for testing purposes.
+  /// Setting this property to true makes the cursor stop blinking or fading
+  /// on and off once the cursor appears on focus. This property is useful for
+  /// testing purposes.
+  ///
+  /// It does not affect the necessity to focus the EditableText for the cursor
+  /// to appear in the first place.
   ///
   /// Defaults to false, resulting in a typical blinking cursor.
   static bool debugDeterministicCursor = false;
@@ -510,6 +676,13 @@ class EditableText extends StatefulWidget {
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
 
+  /// {@template flutter.widgets.editableText.scrollPhysics}
+  /// The [ScrollPhysics] to use when vertically scrolling the input.
+  ///
+  /// If not specified, it will behave according to the current platform.
+  ///
+  /// See [Scrollable.physics].
+  /// {@endtemplate}
   /// {@macro flutter.rendering.editable.selectionEnabled}
   bool get selectionEnabled {
     return enableInteractiveSelection ?? !obscureText;
@@ -799,7 +972,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
               ),
               textCapitalization: widget.textCapitalization,
               keyboardAppearance: widget.keyboardAppearance,
-          )
+          ),
       )..setEditingState(localValue);
     }
     _textInputConnection.show();
@@ -908,7 +1081,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
     _showCaretOnScreenScheduled = true;
     SchedulerBinding.instance.addPostFrameCallback((Duration _) {
       _showCaretOnScreenScheduled = false;
-      if (_currentCaretRect == null || !_scrollController.hasClients){
+      if (_currentCaretRect == null || !_scrollController.hasClients) {
         return;
       }
       final double scrollOffsetForCaret =  _getScrollOffsetForCaret(_currentCaretRect);
@@ -923,7 +1096,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
           newCaretRect.left - widget.scrollPadding.left,
           newCaretRect.top - widget.scrollPadding.top,
           newCaretRect.right + widget.scrollPadding.right,
-          newCaretRect.bottom + widget.scrollPadding.bottom
+          newCaretRect.bottom + widget.scrollPadding.bottom,
       );
       _editableKey.currentContext.findRenderObject().showOnScreen(
         rect: inflatedRect,

@@ -207,7 +207,7 @@ abstract class TextSelectionControls {
       text: delegate.textEditingValue.text,
       selection: TextSelection(
         baseOffset: 0,
-        extentOffset: delegate.textEditingValue.text.length
+        extentOffset: delegate.textEditingValue.text.length,
       ),
     );
     delegate.bringIntoView(delegate.textEditingValue.selection.extent);
@@ -265,7 +265,6 @@ class TextSelectionOverlay {
   /// text field.
   final TextSelectionDelegate selectionDelegate;
 
-  // TODO(jslavitz): Set the DragStartBehavior default to be start across all widgets.
   /// Determines the way that drag start behavior is handled.
   ///
   /// If set to [DragStartBehavior.start], handle drag behavior will
@@ -348,7 +347,7 @@ class TextSelectionOverlay {
     _markNeedsBuild();
   }
 
-  void _markNeedsBuild([Duration duration]) {
+  void _markNeedsBuild([ Duration duration ]) {
     if (_handles != null) {
       _handles[0].markNeedsBuild();
       _handles[1].markNeedsBuild();
@@ -505,13 +504,13 @@ class _TextSelectionHandleOverlayState extends State<_TextSelectionHandleOverlay
       case _TextSelectionHandlePosition.start:
         newSelection = TextSelection(
           baseOffset: position.offset,
-          extentOffset: widget.selection.extentOffset
+          extentOffset: widget.selection.extentOffset,
         );
         break;
       case _TextSelectionHandlePosition.end:
         newSelection = TextSelection(
           baseOffset: widget.selection.baseOffset,
-          extentOffset: position.offset
+          extentOffset: position.offset,
         );
         break;
     }
@@ -577,7 +576,7 @@ class _TextSelectionHandleOverlayState extends State<_TextSelectionHandleOverlay
   TextSelectionHandleType _chooseType(
     TextSelectionPoint endpoint,
     TextSelectionHandleType ltrType,
-    TextSelectionHandleType rtlType
+    TextSelectionHandleType rtlType,
   ) {
     if (widget.selection.isCollapsed)
       return TextSelectionHandleType.collapsed;

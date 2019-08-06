@@ -83,9 +83,9 @@ class GestureRecognizerFactoryWithHandlers<T extends GestureRecognizer> extends 
   /// Creates a gesture recognizer factory with the given callbacks.
   ///
   /// The arguments must not be null.
-  const GestureRecognizerFactoryWithHandlers(this._constructor, this._initializer) :
-    assert(_constructor != null),
-    assert(_initializer != null);
+  const GestureRecognizerFactoryWithHandlers(this._constructor, this._initializer)
+    : assert(_constructor != null),
+      assert(_initializer != null);
 
   final GestureRecognizerFactoryConstructor<T> _constructor;
 
@@ -112,7 +112,7 @@ class GestureRecognizerFactoryWithHandlers<T extends GestureRecognizer> extends 
 /// them to the callbacks. To ignore accessibility events, set
 /// [excludeFromSemantics] to true.
 ///
-/// See <http://flutter.io/gestures/> for additional information.
+/// See <http://flutter.dev/gestures/> for additional information.
 ///
 /// Material design applications typically react to touches with ink splash
 /// effects. The [InkWell] class implements this effect and can be used in place
@@ -256,8 +256,15 @@ class GestureDetector extends StatelessWidget {
   /// succession.
   final GestureTapCallback onDoubleTap;
 
-  /// A pointer has remained in contact with the screen at the same location for
-  /// a long period of time.
+  /// Called when a long press gesture has been recognized.
+  ///
+  /// Triggered when a pointer has remained in contact with the screen at the
+  /// same location for a long period of time.
+  ///
+  /// See also:
+  ///
+  ///  * [onLongPressStart], which has the same timing but has data for the
+  ///    press location.
   final GestureLongPressCallback onLongPress;
 
   /// A pointer that has triggered a long-press has stopped contacting the screen.
@@ -373,7 +380,6 @@ class GestureDetector extends StatelessWidget {
   /// duplication of information.
   final bool excludeFromSemantics;
 
-  // TODO(jslavitz): Set the DragStartBehavior default to be start across all widgets.
   /// Determines the way that drag start behavior is handled.
   ///
   /// If set to [DragStartBehavior.start], gesture drag behavior will
@@ -507,13 +513,13 @@ class GestureDetector extends StatelessWidget {
         onForcePressUpdate != null ||
         onForcePressEnd != null) {
       gestures[ForcePressGestureRecognizer] = GestureRecognizerFactoryWithHandlers<ForcePressGestureRecognizer>(
-          () => ForcePressGestureRecognizer(debugOwner: this),
-          (ForcePressGestureRecognizer instance) {
-            instance
-              ..onStart = onForcePressStart
-              ..onPeak = onForcePressPeak
-              ..onUpdate = onForcePressUpdate
-              ..onEnd = onForcePressEnd;
+        () => ForcePressGestureRecognizer(debugOwner: this),
+        (ForcePressGestureRecognizer instance) {
+          instance
+            ..onStart = onForcePressStart
+            ..onPeak = onForcePressPeak
+            ..onUpdate = onForcePressUpdate
+            ..onEnd = onForcePressEnd;
         },
       );
     }
@@ -820,7 +826,7 @@ class RawGestureDetectorState extends State<RawGestureDetector> {
     Widget result = Listener(
       onPointerDown: _handlePointerDown,
       behavior: widget.behavior ?? _defaultBehavior,
-      child: widget.child
+      child: widget.child,
     );
     if (!widget.excludeFromSemantics)
       result = _GestureSemantics(owner: this, child: result);
@@ -845,7 +851,7 @@ class _GestureSemantics extends SingleChildRenderObjectWidget {
   const _GestureSemantics({
     Key key,
     Widget child,
-    this.owner
+    this.owner,
   }) : super(key: key, child: child);
 
   final RawGestureDetectorState owner;
