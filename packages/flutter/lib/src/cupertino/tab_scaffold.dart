@@ -173,6 +173,16 @@ class _CupertinoTabScaffoldState extends State<CupertinoTabScaffold> {
   @override
   void didUpdateWidget(CupertinoTabScaffold oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_currentPage >= widget.tabBar.items.length) {
+      // Clip down to an acceptable range.
+      _currentPage = widget.tabBar.items.length - 1;
+      // Sanity check, since CupertinoTabBar.items's minimum length is 2.
+      assert(
+        _currentPage >= 0,
+        'CupertinoTabBar is expected to keep at least 2 tabs after updating',
+      );
+    }
+    // The user can still specify an exact desired index.
     if (widget.tabBar.currentIndex != oldWidget.tabBar.currentIndex) {
       _currentPage = widget.tabBar.currentIndex;
     }
@@ -190,14 +200,12 @@ class _CupertinoTabScaffoldState extends State<CupertinoTabScaffold> {
       tabNumber: widget.tabBar.items.length,
       tabBuilder: widget.tabBuilder,
     );
+    EdgeInsets contentPadding = EdgeInsets.zero;
 
     if (widget.resizeToAvoidBottomInset) {
       // Remove the view inset and add it back as a padding in the inner content.
       newMediaQuery = newMediaQuery.removeViewInsets(removeBottom: true);
-      content = Padding(
-        padding: EdgeInsets.only(bottom: existingMediaQuery.viewInsets.bottom),
-        child: content,
-      );
+      contentPadding = EdgeInsets.only(bottom: existingMediaQuery.viewInsets.bottom);
     }
 
     if (widget.tabBar != null &&
@@ -215,10 +223,7 @@ class _CupertinoTabScaffoldState extends State<CupertinoTabScaffold> {
       // translucent, let main content draw behind the tab bar but hint the
       // obstructed area.
       if (widget.tabBar.opaque(context)) {
-        content = Padding(
-          padding: EdgeInsets.only(bottom: bottomPadding),
-          child: content,
-        );
+        contentPadding = EdgeInsets.only(bottom: bottomPadding);
       } else {
         newMediaQuery = newMediaQuery.copyWith(
           padding: newMediaQuery.padding.copyWith(
@@ -230,7 +235,10 @@ class _CupertinoTabScaffoldState extends State<CupertinoTabScaffold> {
 
     content = MediaQuery(
       data: newMediaQuery,
-      child: content,
+      child: Padding(
+        padding: contentPadding,
+        child: content,
+      ),
     );
 
     // The main content being at the bottom is added to the stack first.

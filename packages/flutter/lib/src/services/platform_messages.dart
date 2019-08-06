@@ -8,6 +8,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 
+import 'binding.dart' show ServicesBinding;
 import 'platform_channel.dart';
 
 typedef _MessageHandler = Future<ByteData> Function(ByteData message);

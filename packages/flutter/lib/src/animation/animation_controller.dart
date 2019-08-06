@@ -524,11 +524,10 @@ class AnimationController extends Animation<double>
     return _animateToInternal(target, duration: duration, curve: curve);
   }
 
-  TickerFuture _animateToInternal(double target, { Duration duration, Curve curve = Curves.linear, AnimationBehavior animationBehavior }) {
-    final AnimationBehavior behavior = animationBehavior ?? this.animationBehavior;
+  TickerFuture _animateToInternal(double target, { Duration duration, Curve curve = Curves.linear }) {
     double scale = 1.0;
     if (SemanticsBinding.instance.disableAnimations) {
-      switch (behavior) {
+      switch (animationBehavior) {
         case AnimationBehavior.normal:
           // Since the framework cannot handle zero duration animations, we run it at 5% of the normal
           // duration to limit most animations to a single frame.

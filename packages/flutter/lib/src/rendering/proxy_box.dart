@@ -14,6 +14,7 @@ import 'package:flutter/semantics.dart';
 
 import 'package:vector_math/vector_math_64.dart';
 
+import 'binding.dart';
 import 'box.dart';
 import 'layer.dart';
 import 'object.dart';
@@ -1570,12 +1571,8 @@ abstract class _RenderPhysicalModelBase<T> extends _RenderCustomClip<T> {
     markNeedsPaint();
   }
 
-  static final Paint _transparentPaint = Paint()..color = const Color(0x00000000);
-
-  // On Fuchsia, the system compositor is responsible for drawing shadows
-  // for physical model layers with non-zero elevation.
   @override
-  bool get alwaysNeedsCompositing => _elevation != 0.0 && defaultTargetPlatform == TargetPlatform.fuchsia;
+  bool get alwaysNeedsCompositing => true;
 
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
@@ -1705,37 +1702,18 @@ class RenderPhysicalModel extends _RenderPhysicalModelBase<RRect> {
         }
         return true;
       }());
-      if (needsCompositing) {
-        final PhysicalModelLayer physicalModel = PhysicalModelLayer(
-          clipPath: offsetRRectAsPath,
-          clipBehavior: clipBehavior,
-          elevation: paintShadows ? elevation : 0.0,
-          color: color,
-          shadowColor: shadowColor,
-        );
-        context.pushLayer(physicalModel, super.paint, offset, childPaintBounds: offsetBounds);
-      } else {
-        final Canvas canvas = context.canvas;
-        if (elevation != 0.0 && paintShadows) {
-          // The drawShadow call doesn't add the region of the shadow to the
-          // picture's bounds, so we draw a hardcoded amount of extra space to
-          // account for the maximum potential area of the shadow.
-          // TODO(jsimmons): remove this when Skia does it for us.
-          canvas.drawRect(
-            offsetBounds.inflate(20.0),
-            _RenderPhysicalModelBase._transparentPaint,
-          );
-          canvas.drawShadow(
-            offsetRRectAsPath,
-            shadowColor,
-            elevation,
-            color.alpha != 0xFF,
-          );
-        }
-        canvas.drawRRect(offsetRRect, Paint()..color = color);
-        context.clipRRectAndPaint(offsetRRect, clipBehavior, offsetBounds, () => super.paint(context, offset));
-        assert(context.canvas == canvas, 'canvas changed even though needsCompositing was false');
-      }
+      final PhysicalModelLayer physicalModel = PhysicalModelLayer(
+        clipPath: offsetRRectAsPath,
+        clipBehavior: clipBehavior,
+        elevation: paintShadows ? elevation : 0.0,
+        color: color,
+        shadowColor: shadowColor,
+      );
+      assert(() {
+        physicalModel.debugCreator = debugCreator;
+        return true;
+      }());
+      context.pushLayer(physicalModel, super.paint, offset, childPaintBounds: offsetBounds);
     }
   }
 
@@ -1818,37 +1796,18 @@ class RenderPhysicalShape extends _RenderPhysicalModelBase<Path> {
         }
         return true;
       }());
-      if (needsCompositing) {
-        final PhysicalModelLayer physicalModel = PhysicalModelLayer(
-          clipPath: offsetPath,
-          clipBehavior: clipBehavior,
-          elevation: paintShadows ? elevation : 0.0,
-          color: color,
-          shadowColor: shadowColor,
-        );
-        context.pushLayer(physicalModel, super.paint, offset, childPaintBounds: offsetBounds);
-      } else {
-        final Canvas canvas = context.canvas;
-        if (elevation != 0.0 && paintShadows) {
-          // The drawShadow call doesn't add the region of the shadow to the
-          // picture's bounds, so we draw a hardcoded amount of extra space to
-          // account for the maximum potential area of the shadow.
-          // TODO(jsimmons): remove this when Skia does it for us.
-          canvas.drawRect(
-            offsetBounds.inflate(20.0),
-            _RenderPhysicalModelBase._transparentPaint,
-          );
-          canvas.drawShadow(
-            offsetPath,
-            shadowColor,
-            elevation,
-            color.alpha != 0xFF,
-          );
-        }
-        canvas.drawPath(offsetPath, Paint()..color = color..style = PaintingStyle.fill);
-        context.clipPathAndPaint(offsetPath, clipBehavior, offsetBounds, () => super.paint(context, offset));
-        assert(context.canvas == canvas, 'canvas changed even though needsCompositing was false');
-      }
+      final PhysicalModelLayer physicalModel = PhysicalModelLayer(
+        clipPath: offsetPath,
+        clipBehavior: clipBehavior,
+        elevation: paintShadows ? elevation : 0.0,
+        color: color,
+        shadowColor: shadowColor,
+      );
+      assert(() {
+        physicalModel.debugCreator = debugCreator;
+        return true;
+      }());
+      context.pushLayer(physicalModel, super.paint, offset, childPaintBounds: offsetBounds);
     }
   }
 
@@ -2487,29 +2446,94 @@ typedef PointerUpEventListener = void Function(PointerUpEvent event);
 /// Used by [Listener] and [RenderPointerListener].
 typedef PointerCancelEventListener = void Function(PointerCancelEvent event);
 
+/// Signature for listening to [PointerSignalEvent] events.
+///
+/// Used by [Listener] and [RenderPointerListener].
+typedef PointerSignalEventListener = void Function(PointerSignalEvent event);
+
 /// Calls callbacks in response to pointer events.
 ///
 /// If it has a child, defers to the child for sizing behavior.
 ///
 /// If it does not have a child, grows to fit the parent-provided constraints.
+///
+/// The [onPointerEnter], [onPointerHover], and [onPointerExit] events are only
+/// relevant to and fired by pointers that can hover (e.g. mouse pointers, but
+/// not most touch pointers).
 class RenderPointerListener extends RenderProxyBoxWithHitTestBehavior {
-  /// Creates a render object that forwards point events to callbacks.
+  /// Creates a render object that forwards pointer events to callbacks.
   ///
   /// The [behavior] argument defaults to [HitTestBehavior.deferToChild].
   RenderPointerListener({
     this.onPointerDown,
     this.onPointerMove,
+    PointerEnterEventListener onPointerEnter,
+    PointerHoverEventListener onPointerHover,
+    PointerExitEventListener onPointerExit,
     this.onPointerUp,
     this.onPointerCancel,
+    this.onPointerSignal,
     HitTestBehavior behavior = HitTestBehavior.deferToChild,
-    RenderBox child
-  }) : super(behavior: behavior, child: child);
+    RenderBox child,
+  }) : _onPointerEnter = onPointerEnter,
+       _onPointerHover = onPointerHover,
+       _onPointerExit = onPointerExit,
+       super(behavior: behavior, child: child) {
+    if (_onPointerEnter != null || _onPointerHover != null || _onPointerExit != null) {
+      _hoverAnnotation = MouseTrackerAnnotation(
+        onEnter: _onPointerEnter,
+        onHover: _onPointerHover,
+        onExit: _onPointerExit,
+      );
+    }
+  }
 
-  /// Called when a pointer comes into contact with the screen at this object.
+  /// Called when a pointer comes into contact with the screen (for touch
+  /// pointers), or has its button pressed (for mouse pointers) at this widget's
+  /// location.
   PointerDownEventListener onPointerDown;
 
   /// Called when a pointer that triggered an [onPointerDown] changes position.
   PointerMoveEventListener onPointerMove;
+
+  /// Called when a hovering pointer enters the region for this widget.
+  ///
+  /// If this is a mouse pointer, this will fire when the mouse pointer enters
+  /// the region defined by this widget.
+  PointerEnterEventListener get onPointerEnter => _onPointerEnter;
+  set onPointerEnter(PointerEnterEventListener value) {
+    if (_onPointerEnter != value) {
+      _onPointerEnter = value;
+      _updateAnnotations();
+    }
+  }
+  PointerEnterEventListener _onPointerEnter;
+
+  /// Called when a pointer that has not triggered an [onPointerDown] changes
+  /// position.
+  ///
+  /// Typically only triggered for mouse pointers.
+  PointerHoverEventListener get onPointerHover => _onPointerHover;
+  set onPointerHover(PointerHoverEventListener value) {
+    if (_onPointerHover != value) {
+      _onPointerHover = value;
+      _updateAnnotations();
+    }
+  }
+  PointerHoverEventListener _onPointerHover;
+
+  /// Called when a hovering pointer leaves the region for this widget.
+  ///
+  /// If this is a mouse pointer, this will fire when the mouse pointer leaves
+  /// the region defined by this widget.
+  PointerExitEventListener get onPointerExit => _onPointerExit;
+  set onPointerExit(PointerExitEventListener value) {
+    if (_onPointerExit != value) {
+      _onPointerExit = value;
+      _updateAnnotations();
+    }
+  }
+  PointerExitEventListener _onPointerExit;
 
   /// Called when a pointer that triggered an [onPointerDown] is no longer in
   /// contact with the screen.
@@ -2518,6 +2542,71 @@ class RenderPointerListener extends RenderProxyBoxWithHitTestBehavior {
   /// Called when the input from a pointer that triggered an [onPointerDown] is
   /// no longer directed towards this receiver.
   PointerCancelEventListener onPointerCancel;
+
+  /// Called when a pointer signal occurs over this object.
+  PointerSignalEventListener onPointerSignal;
+
+  // Object used for annotation of the layer used for hover hit detection.
+  MouseTrackerAnnotation _hoverAnnotation;
+
+  /// Object used for annotation of the layer used for hover hit detection.
+  ///
+  /// This is only public to allow for testing of Listener widgets. Do not call
+  /// in other contexts.
+  @visibleForTesting
+  MouseTrackerAnnotation get hoverAnnotation => _hoverAnnotation;
+
+  void _updateAnnotations() {
+    assert(_onPointerEnter != _hoverAnnotation.onEnter || _onPointerHover != _hoverAnnotation.onHover || _onPointerExit != _hoverAnnotation.onExit,
+    "Shouldn't call _updateAnnotations if nothing has changed.");
+    if (_hoverAnnotation != null && attached) {
+      RendererBinding.instance.mouseTracker.detachAnnotation(_hoverAnnotation);
+    }
+    if (_onPointerEnter != null || _onPointerHover != null || _onPointerExit != null) {
+      _hoverAnnotation = MouseTrackerAnnotation(
+        onEnter: _onPointerEnter,
+        onHover: _onPointerHover,
+        onExit: _onPointerExit,
+      );
+      if (attached) {
+        RendererBinding.instance.mouseTracker.attachAnnotation(_hoverAnnotation);
+      }
+    } else {
+      _hoverAnnotation = null;
+    }
+    // Needs to paint in any case, in order to insert/remove the annotation
+    // layer associated with the updated _hoverAnnotation.
+    markNeedsPaint();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    if (_hoverAnnotation != null) {
+      RendererBinding.instance.mouseTracker.attachAnnotation(_hoverAnnotation);
+    }
+  }
+
+  @override
+  void detach() {
+    if (_hoverAnnotation != null) {
+      RendererBinding.instance.mouseTracker.detachAnnotation(_hoverAnnotation);
+    }
+    super.detach();
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (_hoverAnnotation != null) {
+      final AnnotatedRegionLayer<MouseTrackerAnnotation> layer = AnnotatedRegionLayer<MouseTrackerAnnotation>(
+        _hoverAnnotation,
+        size: size,
+        offset: offset,
+      );
+      context.pushLayer(layer, super.paint, offset);
+    }
+    super.paint(context, offset);
+  }
 
   @override
   void performResize() {
@@ -2537,6 +2626,8 @@ class RenderPointerListener extends RenderProxyBoxWithHitTestBehavior {
       return onPointerUp(event);
     if (onPointerCancel != null && event is PointerCancelEvent)
       return onPointerCancel(event);
+    if (onPointerSignal != null && event is PointerSignalEvent)
+      return onPointerSignal(event);
   }
 
   @override
@@ -2547,10 +2638,18 @@ class RenderPointerListener extends RenderProxyBoxWithHitTestBehavior {
       listeners.add('down');
     if (onPointerMove != null)
       listeners.add('move');
+    if (onPointerEnter != null)
+      listeners.add('enter');
+    if (onPointerHover != null)
+      listeners.add('hover');
+    if (onPointerExit != null)
+      listeners.add('exit');
     if (onPointerUp != null)
       listeners.add('up');
     if (onPointerCancel != null)
       listeners.add('cancel');
+    if (onPointerSignal != null)
+      listeners.add('signal');
     if (listeners.isEmpty)
       listeners.add('<none>');
     properties.add(IterableProperty<String>('listeners', listeners));
@@ -4662,7 +4761,11 @@ class RenderAnnotatedRegion<T> extends RenderProxyBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final AnnotatedRegionLayer<T> layer = AnnotatedRegionLayer<T>(value, size: sized ? size : null);
+    final AnnotatedRegionLayer<T> layer = AnnotatedRegionLayer<T>(
+      value,
+      size: sized ? size : null,
+      offset: sized ? offset : null,
+    );
     context.pushLayer(layer, super.paint, offset);
   }
 }

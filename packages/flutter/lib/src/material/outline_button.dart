@@ -346,10 +346,9 @@ class _OutlineButtonState extends State<_OutlineButton> with SingleTickerProvide
   }
 
   Color _getFillColor() {
-    final bool themeIsDark = widget.brightness == Brightness.dark;
-    final Color color = widget.color ?? (themeIsDark
-      ? const Color(0x00000000)
-      : const Color(0x00FFFFFF));
+    if (widget.highlightElevation == null || widget.highlightElevation == 0.0)
+      return Colors.transparent;
+    final Color color = widget.color ?? Theme.of(context).canvasColor;
     final Tween<Color> colorTween = ColorTween(
       begin: color.withAlpha(0x00),
       end: color.withAlpha(0xFF),
@@ -358,28 +357,27 @@ class _OutlineButtonState extends State<_OutlineButton> with SingleTickerProvide
   }
 
   BorderSide _getOutline() {
-    final bool isDark = widget.brightness == Brightness.dark;
     if (widget.borderSide?.style == BorderStyle.none)
       return widget.borderSide;
 
-    final Color color = widget.enabled
-      ? (_pressed
-         ? widget.highlightedBorderColor
-         : (widget.borderSide?.color ??
-            (isDark ? Colors.grey[600] : Colors.grey[200])))
-      : (widget.disabledBorderColor ??
-         (isDark ? Colors.grey[800] : Colors.grey[100]));
+    final Color specifiedColor = widget.enabled
+      ? (_pressed ? widget.highlightedBorderColor : null) ?? widget.borderSide?.color
+      : widget.disabledBorderColor;
+
+    final Color themeColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.12);
 
     return BorderSide(
-      color: color,
-      width: widget.borderSide?.width ?? 2.0,
+      color: specifiedColor ?? themeColor,
+      width: widget.borderSide?.width ?? 1.0,
     );
   }
 
   double _getHighlightElevation() {
+    if (widget.highlightElevation == null || widget.highlightElevation == 0.0)
+      return 0.0;
     return Tween<double>(
       begin: 0.0,
-      end: widget.highlightElevation ?? 2.0,
+      end: widget.highlightElevation,
     ).evaluate(_elevationAnimation);
   }
 

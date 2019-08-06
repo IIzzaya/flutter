@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures;
-import 'dart:ui' as ui show window;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -214,6 +213,9 @@ abstract class WidgetsBindingObserver {
   ///    boilerplate.
   void didChangeTextScaleFactor() { }
 
+  /// {@macro on_platform_brightness_change}
+  void didChangePlatformBrightness() { }
+
   /// Called when the system tells the app that the user's locale has
   /// changed. For example, if the user changes the system language
   /// settings.
@@ -240,7 +242,7 @@ abstract class WidgetsBindingObserver {
   /// features.
   ///
   /// This method exposes notifications from [Window.onAccessibilityFeaturesChanged].
-  void didChangeAccessibilityFeatures() {}
+  void didChangeAccessibilityFeatures() { }
 }
 
 /// The glue between the widgets layer and the Flutter engine.
@@ -250,8 +252,8 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
     super.initInstances();
     _instance = this;
     buildOwner.onBuildScheduled = _handleBuildScheduled;
-    ui.window.onLocaleChanged = handleLocaleChanged;
-    ui.window.onAccessibilityFeaturesChanged = handleAccessibilityFeaturesChanged;
+    window.onLocaleChanged = handleLocaleChanged;
+    window.onAccessibilityFeaturesChanged = handleAccessibilityFeaturesChanged;
     SystemChannels.navigation.setMethodCallHandler(_handleNavigationInvocation);
     SystemChannels.system.setMessageHandler(_handleSystemMessage);
   }
@@ -268,7 +270,7 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
   void initServiceExtensions() {
     super.initServiceExtensions();
 
-    profile(() {
+    if (!kReleaseMode) {
       registerSignalServiceExtension(
         name: 'debugDumpApp',
         callback: () {
@@ -296,21 +298,8 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
             // This is defined to return a STRING, not a boolean.
             // Devtools, the Intellij plugin, and the flutter tool all depend
             // on it returning a string and not a boolean.
-            'enabled': _needToReportFirstFrame ? 'false' : 'true'
+            'enabled': _needToReportFirstFrame ? 'false' : 'true',
           };
-        },
-      );
-    });
-
-    assert(() {
-      registerBoolServiceExtension(
-        name: 'debugAllowBanner',
-        getter: () => Future<bool>.value(WidgetsApp.debugAllowBannerOverride),
-        setter: (bool value) {
-          if (WidgetsApp.debugAllowBannerOverride == value)
-            return Future<void>.value();
-          WidgetsApp.debugAllowBannerOverride = value;
-          return _forceRebuild();
         },
       );
 
@@ -321,6 +310,19 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
         setter: (bool value) async {
           if (debugProfileBuildsEnabled != value)
             debugProfileBuildsEnabled = value;
+        },
+      );
+    }
+
+    assert(() {
+      registerBoolServiceExtension(
+        name: 'debugAllowBanner',
+        getter: () => Future<bool>.value(WidgetsApp.debugAllowBannerOverride),
+        setter: (bool value) {
+          if (WidgetsApp.debugAllowBannerOverride == value)
+            return Future<void>.value();
+          WidgetsApp.debugAllowBannerOverride = value;
+          return _forceRebuild();
         },
       );
 
@@ -410,6 +412,13 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
   }
 
   @override
+  void handlePlatformBrightnessChanged() {
+    super.handlePlatformBrightnessChanged();
+    for (WidgetsBindingObserver observer in _observers)
+      observer.didChangePlatformBrightness();
+  }
+
+  @override
   void handleAccessibilityFeaturesChanged() {
     super.handleAccessibilityFeaturesChanged();
     for (WidgetsBindingObserver observer in _observers)
@@ -424,7 +433,7 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
   @protected
   @mustCallSuper
   void handleLocaleChanged() {
-    dispatchLocalesChanged(ui.window.locales);
+    dispatchLocalesChanged(window.locales);
   }
 
   /// Notify all the observers that the locale has changed (using
@@ -557,10 +566,10 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
   /// This is used by [WidgetsApp] to avoid reporting frames that aren't useful
   /// during startup as the "first frame".
   void deferFirstFrameReport() {
-    profile(() {
+    if (!kReleaseMode) {
       assert(_deferFirstFrameReportCount >= 0);
       _deferFirstFrameReportCount += 1;
-    });
+    }
   }
 
   /// When called after [deferFirstFrameReport]: tell the framework to report
@@ -572,10 +581,10 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
   /// This is used by [WidgetsApp] to report when the first useful frame is
   /// painted.
   void allowFirstFrameReport() {
-    profile(() {
+    if (!kReleaseMode) {
       assert(_deferFirstFrameReportCount >= 1);
       _deferFirstFrameReportCount -= 1;
-    });
+    }
   }
 
   void _handleBuildScheduled() {
@@ -697,13 +706,13 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
         return true;
       }());
     }
-    profile(() {
+    if (!kReleaseMode) {
       if (_needToReportFirstFrame && _reportFirstFrame) {
         developer.Timeline.instantSync('Widgets completed first useful frame');
         developer.postEvent('Flutter.FirstFrame', <String, dynamic>{});
         _needToReportFirstFrame = false;
       }
-    });
+    }
   }
 
   /// The [Element] that is at the root of the hierarchy (and which wraps the

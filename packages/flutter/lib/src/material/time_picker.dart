@@ -965,10 +965,10 @@ class _DialPainter extends CustomPainter {
             textDirection: textDirection,
             onTap: label.onTap,
           ),
-          tags: Set<SemanticsTag>.from(const <SemanticsTag>[
+          tags: const <SemanticsTag>{
             // Used by tests to find this node.
             SemanticsTag('dial-label'),
-          ]),
+          },
         );
         nodes.add(node);
         labelTheta += labelThetaIncrement;
@@ -1719,15 +1719,19 @@ class _TimePickerDialogState extends State<_TimePickerDialog> {
 ///    date picker.
 Future<TimeOfDay> showTimePicker({
   @required BuildContext context,
-  @required TimeOfDay initialTime
+  @required TimeOfDay initialTime,
+  TransitionBuilder builder,
 }) async {
   assert(context != null);
   assert(initialTime != null);
   assert(debugCheckHasMaterialLocalizations(context));
 
+  final Widget dialog = _TimePickerDialog(initialTime: initialTime);
   return await showDialog<TimeOfDay>(
     context: context,
-    builder: (BuildContext context) => _TimePickerDialog(initialTime: initialTime),
+    builder: (BuildContext context) {
+      return builder == null ? dialog : builder(context, dialog);
+    },
   );
 }
 

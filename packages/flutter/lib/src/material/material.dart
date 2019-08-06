@@ -173,6 +173,7 @@ class Material extends StatefulWidget {
     this.textStyle,
     this.borderRadius,
     this.shape,
+    this.borderOnForeground = true,
     this.clipBehavior = Clip.none,
     this.animationDuration = kThemeChangeDuration,
     this.child,
@@ -183,6 +184,7 @@ class Material extends StatefulWidget {
        assert(animationDuration != null),
        assert(!(identical(type, MaterialType.circle) && (borderRadius != null || shape != null))),
        assert(clipBehavior != null),
+       assert(borderOnForeground != null),
        super(key: key);
 
   /// The widget below this widget in the tree.
@@ -235,6 +237,12 @@ class Material extends StatefulWidget {
   /// zero.
   final ShapeBorder shape;
 
+  /// Whether to paint the [shape] border in front of the [child].
+  ///
+  /// The default value is true.
+  /// If false, the border will be painted behind the [child].
+  final bool borderOnForeground;
+
   /// {@template flutter.widgets.Clip}
   /// The content will be clipped (or not) according to this option.
   ///
@@ -258,7 +266,7 @@ class Material extends StatefulWidget {
   /// If [shape] is non null then the border radius is ignored.
   ///
   /// Must be null if [type] is [MaterialType.circle].
-  final BorderRadius borderRadius;
+  final BorderRadiusGeometry borderRadius;
 
   /// The ink controller from the closest instance of this class that
   /// encloses the given context.
@@ -285,7 +293,8 @@ class Material extends StatefulWidget {
     properties.add(DiagnosticsProperty<Color>('shadowColor', shadowColor, defaultValue: const Color(0xFF000000)));
     textStyle?.debugFillProperties(properties, prefix: 'textStyle.');
     properties.add(DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null));
-    properties.add(EnumProperty<BorderRadius>('borderRadius', borderRadius, defaultValue: null));
+    properties.add(DiagnosticsProperty<bool>('borderOnForeground', borderOnForeground, defaultValue: true));
+    properties.add(DiagnosticsProperty<BorderRadiusGeometry>('borderRadius', borderRadius, defaultValue: null));
   }
 
   /// The default radius of an ink splash in logical pixels.
@@ -311,7 +320,13 @@ class _MaterialState extends State<Material> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final Color backgroundColor = _getBackgroundColor(context);
-    assert(backgroundColor != null || widget.type == MaterialType.transparency);
+    assert(
+      backgroundColor != null || widget.type == MaterialType.transparency,
+      'If Material type is not MaterialType.transparency, a color must '
+      'either be passed in through the `color` property, or be defined '
+      'in the theme (ex. canvasColor != null if type is set to '
+      'MaterialType.canvas)'
+    );
     Widget contents = widget.child;
     if (contents != null) {
       contents = AnimatedDefaultTextStyle(
@@ -373,6 +388,7 @@ class _MaterialState extends State<Material> with TickerProviderStateMixin {
       curve: Curves.fastOutSlowIn,
       duration: widget.animationDuration,
       shape: shape,
+      borderOnForeground: widget.borderOnForeground,
       clipBehavior: widget.clipBehavior,
       elevation: widget.elevation,
       color: backgroundColor,
@@ -620,6 +636,7 @@ class _MaterialInterior extends ImplicitlyAnimatedWidget {
     Key key,
     @required this.child,
     @required this.shape,
+    this.borderOnForeground = true,
     this.clipBehavior = Clip.none,
     @required this.elevation,
     @required this.color,
@@ -644,6 +661,12 @@ class _MaterialInterior extends ImplicitlyAnimatedWidget {
   /// This border will be painted, and in addition the outer path of the border
   /// determines the physical shape.
   final ShapeBorder shape;
+
+  /// Whether to paint the border in front of the child.
+  ///
+  /// The default value is true.
+  /// If false, the border will be painted behind the child.
+  final bool borderOnForeground;
 
   /// {@macro flutter.widgets.Clip}
   final Clip clipBehavior;
@@ -692,10 +715,11 @@ class _MaterialInteriorState extends AnimatedWidgetBaseState<_MaterialInterior> 
       child: _ShapeBorderPaint(
         child: widget.child,
         shape: shape,
+        borderOnForeground: widget.borderOnForeground,
       ),
       clipper: ShapeBorderClipper(
         shape: shape,
-        textDirection: Directionality.of(context)
+        textDirection: Directionality.of(context),
       ),
       clipBehavior: widget.clipBehavior,
       elevation: _elevation.evaluate(animation),
@@ -709,16 +733,19 @@ class _ShapeBorderPaint extends StatelessWidget {
   const _ShapeBorderPaint({
     @required this.child,
     @required this.shape,
+    this.borderOnForeground = true,
   });
 
   final Widget child;
   final ShapeBorder shape;
+  final bool borderOnForeground;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       child: child,
-      foregroundPainter: _ShapeBorderPainter(shape, Directionality.of(context)),
+      painter: borderOnForeground ? null : _ShapeBorderPainter(shape, Directionality.of(context)),
+      foregroundPainter: borderOnForeground ? _ShapeBorderPainter(shape, Directionality.of(context)) : null,
     );
   }
 }

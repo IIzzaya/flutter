@@ -183,7 +183,7 @@ class ImageStream extends Diagnosticable {
     if (_completer != null)
       return _completer.removeListener(listener);
     assert(_listeners != null);
-    for (int i = 0; i < _listeners.length; ++i) {
+    for (int i = 0; i < _listeners.length; i += 1) {
       if (_listeners[i].listener == listener) {
         _listeners.removeAt(i);
         break;
@@ -234,6 +234,24 @@ abstract class ImageStreamCompleter extends Diagnosticable {
   final List<_ImageListenerPair> _listeners = <_ImageListenerPair>[];
   ImageInfo _currentImage;
   FlutterErrorDetails _currentError;
+
+  /// Whether any listeners are currently registered.
+  ///
+  /// Clients should not depend on this value for their behavior, because having
+  /// one listener's logic change when another listener happens to start or stop
+  /// listening will lead to extremely hard-to-track bugs. Subclasses might use
+  /// this information to determine whether to do any work when there are no
+  /// listeners, however; for example, [MultiFrameImageStreamCompleter] uses it
+  /// to determine when to iterate through frames of an animated image.
+  ///
+  /// Typically this is used by overriding [addListener], checking if
+  /// [hasListeners] is false before calling `super.addListener()`, and if so,
+  /// starting whatever work is needed to determine when to call
+  /// [notifyListeners]; and similarly, by overriding [removeListener], checking
+  /// if [hasListeners] is false after calling `super.removeListener()`, and if
+  /// so, stopping that same work.
+  @protected
+  bool get hasListeners => _listeners.isNotEmpty;
 
   /// Adds a listener callback that is called whenever a new concrete [ImageInfo]
   /// object is available or an error is reported. If a concrete image is
@@ -290,8 +308,13 @@ abstract class ImageStreamCompleter extends Diagnosticable {
 
   /// Stop listening for new concrete [ImageInfo] objects and errors from
   /// its associated [ImageErrorListener].
+  ///
+  /// If `listener` has been added multiple times, this removes the first
+  /// instance of the listener, along with the `onError` listener that was
+  /// registered with that first instance. This might not be the instance that
+  /// the `addListener` corresponding to this `removeListener` had added.
   void removeListener(ImageListener listener) {
-    for (int i = 0; i < _listeners.length; ++i) {
+    for (int i = 0; i < _listeners.length; i += 1) {
       if (_listeners[i].listener == listener) {
         _listeners.removeAt(i);
         break;
@@ -382,7 +405,7 @@ abstract class ImageStreamCompleter extends Diagnosticable {
         } catch (exception, stack) {
           FlutterError.reportError(
             FlutterErrorDetails(
-              context: 'by an image error listener',
+              context: 'when reporting an error to an image listener',
               library: 'image resource service',
               exception: exception,
               stack: stack,
@@ -485,9 +508,7 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
     InformationCollector informationCollector,
   }) : assert(codec != null),
        _informationCollector = informationCollector,
-       _scale = scale,
-       _framesEmitted = 0,
-       _timer = null {
+       _scale = scale {
     codec.then<void>(_handleCodecReady, onError: (dynamic error, StackTrace stack) {
       reportError(
         context: 'resolving an image codec',
@@ -508,18 +529,24 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
   // The requested duration for the current frame;
   Duration _frameDuration;
   // How many frames have been emitted so far.
-  int _framesEmitted;
+  int _framesEmitted = 0;
   Timer _timer;
+
+  // Used to guard against registering multiple _handleAppFrame callbacks for the same frame.
+  bool _frameCallbackScheduled = false;
 
   void _handleCodecReady(ui.Codec codec) {
     _codec = codec;
     assert(_codec != null);
 
-    _decodeNextFrameAndSchedule();
+    if (hasListeners) {
+      _decodeNextFrameAndSchedule();
+    }
   }
 
   void _handleAppFrame(Duration timestamp) {
-    if (!_hasActiveListeners)
+    _frameCallbackScheduled = false;
+    if (!hasListeners)
       return;
     if (_isFirstFrame() || _hasFrameDurationPassed(timestamp)) {
       _emitFrame(ImageInfo(image: _nextFrame.image, scale: _scale));
@@ -534,7 +561,7 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
     }
     final Duration delay = _frameDuration - (timestamp - _shownTimestamp);
     _timer = Timer(delay * timeDilation, () {
-      SchedulerBinding.instance.scheduleFrameCallback(_handleAppFrame);
+      _scheduleAppFrame();
     });
   }
 
@@ -566,6 +593,14 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
       _emitFrame(ImageInfo(image: _nextFrame.image, scale: _scale));
       return;
     }
+    _scheduleAppFrame();
+  }
+
+  void _scheduleAppFrame() {
+    if (_frameCallbackScheduled) {
+      return;
+    }
+    _frameCallbackScheduled = true;
     SchedulerBinding.instance.scheduleFrameCallback(_handleAppFrame);
   }
 
@@ -574,20 +609,17 @@ class MultiFrameImageStreamCompleter extends ImageStreamCompleter {
     _framesEmitted += 1;
   }
 
-  bool get _hasActiveListeners => _listeners.isNotEmpty;
-
   @override
   void addListener(ImageListener listener, { ImageErrorListener onError }) {
-    if (!_hasActiveListeners && _codec != null) {
+    if (!hasListeners && _codec != null)
       _decodeNextFrameAndSchedule();
-    }
     super.addListener(listener, onError: onError);
   }
 
   @override
   void removeListener(ImageListener listener) {
     super.removeListener(listener);
-    if (!_hasActiveListeners) {
+    if (!hasListeners) {
       _timer?.cancel();
       _timer = null;
     }

@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 
 import 'colors.dart';
 import 'thumb_painter.dart';
@@ -53,14 +54,16 @@ import 'thumb_painter.dart';
 class CupertinoSwitch extends StatefulWidget {
   /// Creates an iOS-style switch.
   ///
-  /// [dragStartBehavior] must not be null.
+  /// The [value] parameter must not be null.
+  /// The [dragStartBehavior] parameter defaults to [DragStartBehavior.start] and must not be null.
   const CupertinoSwitch({
     Key key,
     @required this.value,
     @required this.onChanged,
     this.activeColor,
-    this.dragStartBehavior = DragStartBehavior.down,
-  }) : assert(dragStartBehavior != null),
+    this.dragStartBehavior = DragStartBehavior.start,
+  }) : assert(value != null),
+       assert(dragStartBehavior != null),
        super(key: key);
 
   /// Whether this switch is on or off.
@@ -132,12 +135,15 @@ class CupertinoSwitch extends StatefulWidget {
 class _CupertinoSwitchState extends State<CupertinoSwitch> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    return _CupertinoSwitchRenderObjectWidget(
-      value: widget.value,
-      activeColor: widget.activeColor ?? CupertinoColors.activeGreen,
-      onChanged: widget.onChanged,
-      vsync: this,
-      dragStartBehavior: widget.dragStartBehavior,
+    return Opacity(
+      opacity: widget.onChanged == null ? _kCupertinoSwitchDisabledOpacity : 1.0,
+      child: _CupertinoSwitchRenderObjectWidget(
+        value: widget.value,
+        activeColor: widget.activeColor ?? CupertinoColors.activeGreen,
+        onChanged: widget.onChanged,
+        vsync: this,
+        dragStartBehavior: widget.dragStartBehavior,
+      ),
     );
   }
 }
@@ -149,7 +155,7 @@ class _CupertinoSwitchRenderObjectWidget extends LeafRenderObjectWidget {
     this.activeColor,
     this.onChanged,
     this.vsync,
-    this.dragStartBehavior = DragStartBehavior.down,
+    this.dragStartBehavior = DragStartBehavior.start,
   }) : super(key: key);
 
   final bool value;
@@ -190,6 +196,8 @@ const double _kTrackInnerEnd = _kTrackWidth - _kTrackInnerStart;
 const double _kTrackInnerLength = _kTrackInnerEnd - _kTrackInnerStart;
 const double _kSwitchWidth = 59.0;
 const double _kSwitchHeight = 39.0;
+// Opacity of a disabled switch, as eye-balled from iOS Simulator on Mac.
+const double _kCupertinoSwitchDisabledOpacity = 0.5;
 
 const Color _kTrackColor = CupertinoColors.lightBackgroundGray;
 const Duration _kReactionDuration = Duration(milliseconds: 300);
@@ -202,7 +210,7 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
     ValueChanged<bool> onChanged,
     @required TextDirection textDirection,
     @required TickerProvider vsync,
-    DragStartBehavior dragStartBehavior = DragStartBehavior.down,
+    DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : assert(value != null),
        assert(activeColor != null),
        assert(vsync != null),
@@ -367,8 +375,10 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
   }
 
   void _handleTap() {
-    if (isInteractive)
+    if (isInteractive) {
       onChanged(!_value);
+      _emitVibration();
+    }
   }
 
   void _handleTapUp(TapUpDetails details) {
@@ -382,8 +392,10 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
   }
 
   void _handleDragStart(DragStartDetails details) {
-    if (isInteractive)
+    if (isInteractive) {
       _reactionController.forward();
+      _emitVibration();
+    }
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
@@ -409,6 +421,17 @@ class _RenderCupertinoSwitch extends RenderConstrainedBox {
     else
       _positionController.reverse();
     _reactionController.reverse();
+  }
+
+  void _emitVibration() {
+    switch(defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        HapticFeedback.lightImpact();
+        break;
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.android:
+        break;
+    }
   }
 
   @override

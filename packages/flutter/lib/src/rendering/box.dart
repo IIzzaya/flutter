@@ -574,7 +574,7 @@ class BoxConstraints extends Constraints {
     assert(debugAssertIsValid());
     if (identical(this, other))
       return true;
-    if (other is! BoxConstraints)
+    if (runtimeType != other.runtimeType)
       return false;
     final BoxConstraints typedOther = other;
     assert(typedOther.debugAssertIsValid());
@@ -1801,9 +1801,9 @@ abstract class RenderBox extends RenderObject {
         testIntrinsicsForValues(getMinIntrinsicWidth, getMaxIntrinsicWidth, 'Width', double.infinity);
         testIntrinsicsForValues(getMinIntrinsicHeight, getMaxIntrinsicHeight, 'Height', double.infinity);
         if (constraints.hasBoundedWidth)
-          testIntrinsicsForValues(getMinIntrinsicWidth, getMaxIntrinsicWidth, 'Width', constraints.maxWidth);
+          testIntrinsicsForValues(getMinIntrinsicWidth, getMaxIntrinsicWidth, 'Width', constraints.maxHeight);
         if (constraints.hasBoundedHeight)
-          testIntrinsicsForValues(getMinIntrinsicHeight, getMaxIntrinsicHeight, 'Height', constraints.maxHeight);
+          testIntrinsicsForValues(getMinIntrinsicHeight, getMaxIntrinsicHeight, 'Height', constraints.maxWidth);
 
         // TODO(ianh): Test that values are internally consistent in more ways than the above.
 

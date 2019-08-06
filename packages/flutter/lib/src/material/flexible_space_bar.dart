@@ -47,7 +47,8 @@ class FlexibleSpaceBar extends StatefulWidget {
     this.title,
     this.background,
     this.centerTitle,
-    this.collapseMode = CollapseMode.parallax
+    this.titlePadding,
+    this.collapseMode = CollapseMode.parallax,
   }) : assert(collapseMode != null),
        super(key: key);
 
@@ -71,6 +72,18 @@ class FlexibleSpaceBar extends StatefulWidget {
   ///
   /// Defaults to [CollapseMode.parallax].
   final CollapseMode collapseMode;
+
+  /// Defines how far the [title] is inset from either the widget's
+  /// bottom-left or its center.
+  ///
+  /// Typically this property is used to adjust how far the title is
+  /// is inset from the bottom-left and it is specified along with
+  /// [centerTitle] false.
+  ///
+  /// By default the value of this property is
+  /// `EdgeInsetsDirectional.only(start: 72, bottom: 16)` if the title is
+  /// not centered, `EdgeInsetsDirectional.only(start 0, bottom: 16)` otherwise.
+  final EdgeInsetsGeometry titlePadding;
 
   /// Wraps a widget that contains an [AppBar] to convey sizing information down
   /// to the [FlexibleSpaceBar].
@@ -207,15 +220,17 @@ class _FlexibleSpaceBarState extends State<FlexibleSpaceBar> {
           color: titleStyle.color.withOpacity(opacity)
         );
         final bool effectiveCenterTitle = _getEffectiveCenterTitle(theme);
+        final EdgeInsetsGeometry padding = widget.titlePadding ??
+          EdgeInsetsDirectional.only(
+            start: effectiveCenterTitle ? 0.0 : 72.0,
+            bottom: 16.0,
+          );
         final double scaleValue = Tween<double>(begin: 1.5, end: 1.0).transform(t);
         final Matrix4 scaleTransform = Matrix4.identity()
           ..scale(scaleValue, scaleValue, 1.0);
         final Alignment titleAlignment = _getTitleAlignment(effectiveCenterTitle);
         children.add(Container(
-          padding: EdgeInsetsDirectional.only(
-            start: effectiveCenterTitle ? 0.0 : 72.0,
-            bottom: 16.0
-          ),
+          padding: padding,
           child: Transform(
             alignment: titleAlignment,
             transform: scaleTransform,

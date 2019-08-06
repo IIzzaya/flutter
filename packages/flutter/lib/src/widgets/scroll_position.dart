@@ -432,7 +432,7 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
         break;
     }
 
-    final Set<SemanticsAction> actions = Set<SemanticsAction>();
+    final Set<SemanticsAction> actions = <SemanticsAction>{};
     if (pixels > minScrollExtent)
       actions.add(backward);
     if (pixels < maxScrollExtent)
@@ -612,6 +612,7 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
   ///
   /// Call [beginActivity] to change the current activity.
   @protected
+  @visibleForTesting
   ScrollActivity get activity => _activity;
   ScrollActivity _activity;
 

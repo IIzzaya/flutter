@@ -111,6 +111,18 @@ abstract class ChipAttributes {
   ///
   ///  * [MaterialTapTargetSize], for a description of how this affects tap targets.
   MaterialTapTargetSize get materialTapTargetSize;
+
+  /// Elevation to be applied on the chip relative to its parent.
+  ///
+  /// This controls the size of the shadow below the chip.
+  ///
+  /// Defaults to 0. The value is always non-negative.
+  double get elevation;
+
+  /// Color of the chip's shadow when the elevation is greater than 0.
+  ///
+  /// The default is [Colors.black].
+  Color get shadowColor;
 }
 
 /// An interface for material design chips that can be deleted.
@@ -303,6 +315,12 @@ abstract class SelectableChipAttributes {
   /// The chip is selected when [selected] is true.
   Color get selectedColor;
 
+  /// Color of the chip's shadow when the elevation is greater than 0 and the
+  /// chip is selected.
+  ///
+  /// The default is [Colors.black].
+  Color get selectedShadowColor;
+
   /// Tooltip string to be used for the body area (where the label and avatar
   /// are) of the chip.
   String get tooltip;
@@ -481,9 +499,12 @@ class Chip extends StatelessWidget implements ChipAttributes, DeletableChipAttri
     this.backgroundColor,
     this.padding,
     this.materialTapTargetSize,
-  })  : assert(label != null),
-        assert(clipBehavior != null),
-        super(key: key);
+    this.elevation,
+    this.shadowColor,
+  }) : assert(label != null),
+       assert(clipBehavior != null),
+       assert(elevation == null || elevation >= 0.0),
+       super(key: key);
 
   @override
   final Widget avatar;
@@ -511,6 +532,10 @@ class Chip extends StatelessWidget implements ChipAttributes, DeletableChipAttri
   final String deleteButtonTooltipMessage;
   @override
   final MaterialTapTargetSize materialTapTargetSize;
+  @override
+  final double elevation;
+  @override
+  final Color shadowColor;
 
   @override
   Widget build(BuildContext context) {
@@ -530,6 +555,8 @@ class Chip extends StatelessWidget implements ChipAttributes, DeletableChipAttri
       backgroundColor: backgroundColor,
       padding: padding,
       materialTapTargetSize: materialTapTargetSize,
+      elevation: elevation,
+      shadowColor: shadowColor,
       isEnabled: true,
     );
   }
@@ -609,7 +636,7 @@ class InputChip extends StatelessWidget
     this.deleteIconColor,
     this.deleteButtonTooltipMessage,
     this.onPressed,
-    this.pressElevation = 8.0,
+    this.pressElevation,
     this.disabledColor,
     this.selectedColor,
     this.tooltip,
@@ -618,12 +645,17 @@ class InputChip extends StatelessWidget
     this.backgroundColor,
     this.padding,
     this.materialTapTargetSize,
+    this.elevation,
+    this.shadowColor,
+    this.selectedShadowColor,
     this.avatarBorder = const CircleBorder(),
-  })  : assert(selected != null),
-        assert(isEnabled != null),
-        assert(label != null),
-        assert(clipBehavior != null),
-        super(key: key);
+  }) : assert(selected != null),
+       assert(isEnabled != null),
+       assert(label != null),
+       assert(clipBehavior != null),
+       assert(pressElevation == null || pressElevation >= 0.0),
+       assert(elevation == null || elevation >= 0.0),
+       super(key: key);
 
   @override
   final Widget avatar;
@@ -668,6 +700,12 @@ class InputChip extends StatelessWidget
   @override
   final MaterialTapTargetSize materialTapTargetSize;
   @override
+  final double elevation;
+  @override
+  final Color shadowColor;
+  @override
+  final Color selectedShadowColor;
+  @override
   final ShapeBorder avatarBorder;
 
   @override
@@ -695,6 +733,9 @@ class InputChip extends StatelessWidget
       backgroundColor: backgroundColor,
       padding: padding,
       materialTapTargetSize: materialTapTargetSize,
+      elevation: elevation,
+      shadowColor: shadowColor,
+      selectedShadowColor: selectedShadowColor,
       isEnabled: isEnabled && (onSelected != null || onDeleted != null || onPressed != null),
       avatarBorder: avatarBorder,
     );
@@ -772,7 +813,7 @@ class ChoiceChip extends StatelessWidget
     this.labelStyle,
     this.labelPadding,
     this.onSelected,
-    this.pressElevation = 8.0,
+    this.pressElevation,
     @required this.selected,
     this.selectedColor,
     this.disabledColor,
@@ -782,11 +823,16 @@ class ChoiceChip extends StatelessWidget
     this.backgroundColor,
     this.padding,
     this.materialTapTargetSize,
+    this.elevation,
+    this.shadowColor,
+    this.selectedShadowColor,
     this.avatarBorder = const CircleBorder(),
-  })  : assert(selected != null),
-        assert(label != null),
-        assert(clipBehavior != null),
-        super(key: key);
+  }) : assert(selected != null),
+       assert(label != null),
+       assert(clipBehavior != null),
+       assert(pressElevation == null || pressElevation >= 0.0),
+       assert(elevation == null || elevation >= 0.0),
+       super(key: key);
 
   @override
   final Widget avatar;
@@ -819,6 +865,12 @@ class ChoiceChip extends StatelessWidget
   @override
   final MaterialTapTargetSize materialTapTargetSize;
   @override
+  final double elevation;
+  @override
+  final Color shadowColor;
+  @override
+  final Color selectedShadowColor;
+  @override
   final ShapeBorder avatarBorder;
 
   @override
@@ -847,6 +899,9 @@ class ChoiceChip extends StatelessWidget
       padding: padding,
       isEnabled: isEnabled,
       materialTapTargetSize: materialTapTargetSize,
+      elevation: elevation,
+      shadowColor: shadowColor,
+      selectedShadowColor: selectedShadowColor,
       avatarBorder: avatarBorder,
     );
   }
@@ -956,7 +1011,7 @@ class FilterChip extends StatelessWidget
     this.labelPadding,
     this.selected = false,
     @required this.onSelected,
-    this.pressElevation = 8.0,
+    this.pressElevation,
     this.disabledColor,
     this.selectedColor,
     this.tooltip,
@@ -965,11 +1020,16 @@ class FilterChip extends StatelessWidget
     this.backgroundColor,
     this.padding,
     this.materialTapTargetSize,
+    this.elevation,
+    this.shadowColor,
+    this.selectedShadowColor,
     this.avatarBorder = const CircleBorder(),
-  })  : assert(selected != null),
-        assert(label != null),
-        assert(clipBehavior != null),
-        super(key: key);
+  }) : assert(selected != null),
+       assert(label != null),
+       assert(clipBehavior != null),
+       assert(pressElevation == null || pressElevation >= 0.0),
+       assert(elevation == null || elevation >= 0.0),
+       super(key: key);
 
   @override
   final Widget avatar;
@@ -1002,6 +1062,12 @@ class FilterChip extends StatelessWidget
   @override
   final MaterialTapTargetSize materialTapTargetSize;
   @override
+  final double elevation;
+  @override
+  final Color shadowColor;
+  @override
+  final Color selectedShadowColor;
+  @override
   final ShapeBorder avatarBorder;
 
   @override
@@ -1027,6 +1093,9 @@ class FilterChip extends StatelessWidget
       padding: padding,
       isEnabled: isEnabled,
       materialTapTargetSize: materialTapTargetSize,
+      elevation: elevation,
+      shadowColor: shadowColor,
+      selectedShadowColor: selectedShadowColor,
       avatarBorder: avatarBorder,
     );
   }
@@ -1092,20 +1161,24 @@ class ActionChip extends StatelessWidget implements ChipAttributes, TappableChip
     this.labelStyle,
     this.labelPadding,
     @required this.onPressed,
-    this.pressElevation = 8.0,
+    this.pressElevation,
     this.tooltip,
     this.shape,
     this.clipBehavior = Clip.none,
     this.backgroundColor,
     this.padding,
     this.materialTapTargetSize,
-  })  : assert(label != null),
-        assert(
-          onPressed != null,
-          'Rather than disabling an ActionChip by setting onPressed to null, '
-          'remove it from the interface entirely.',
-        ),
-        super(key: key);
+    this.elevation,
+    this.shadowColor,
+  }) : assert(label != null),
+       assert(
+         onPressed != null,
+         'Rather than disabling an ActionChip by setting onPressed to null, '
+         'remove it from the interface entirely.',
+       ),
+       assert(pressElevation == null || pressElevation >= 0.0),
+       assert(elevation == null || elevation >= 0.0),
+       super(key: key);
 
   @override
   final Widget avatar;
@@ -1131,6 +1204,10 @@ class ActionChip extends StatelessWidget implements ChipAttributes, TappableChip
   final EdgeInsetsGeometry padding;
   @override
   final MaterialTapTargetSize materialTapTargetSize;
+  @override
+  final double elevation;
+  @override
+  final Color shadowColor;
 
   @override
   Widget build(BuildContext context) {
@@ -1148,7 +1225,9 @@ class ActionChip extends StatelessWidget implements ChipAttributes, TappableChip
       padding: padding,
       labelPadding: labelPadding,
       isEnabled: true,
-      materialTapTargetSize: materialTapTargetSize
+      materialTapTargetSize: materialTapTargetSize,
+      elevation: elevation,
+      shadowColor: shadowColor,
     );
   }
 }
@@ -1182,7 +1261,7 @@ class ActionChip extends StatelessWidget implements ChipAttributes, TappableChip
 ///  * [CircleAvatar], which shows images or initials of people.
 ///  * [Wrap], A widget that displays its children in multiple horizontal or
 ///    vertical runs.
-///  * <https://material.google.com/components/chips.html>
+///  * <https://material.io/design/components/chips.html>
 class RawChip extends StatefulWidget
     implements
         ChipAttributes,
@@ -1195,8 +1274,9 @@ class RawChip extends StatefulWidget
   /// The [onPressed] and [onSelected] callbacks must not both be specified at
   /// the same time.
   ///
-  /// The [label], [pressElevation], [isEnabled], and [clipBehavior] arguments
-  /// must not be null. Additionally, [pressElevation] must be non-negative.
+  /// The [label], [isEnabled], and [clipBehavior] arguments must not be null.
+  /// The [pressElevation] and [elevation] must be null or non-negative.
+  /// Typically, [pressElevation] is greater than [elevation].
   const RawChip({
     Key key,
     this.avatar,
@@ -1210,7 +1290,7 @@ class RawChip extends StatefulWidget
     this.deleteButtonTooltipMessage,
     this.onPressed,
     this.onSelected,
-    this.pressElevation = 8.0,
+    this.pressElevation,
     this.tapEnabled = true,
     this.selected,
     this.showCheckmark = true,
@@ -1222,13 +1302,17 @@ class RawChip extends StatefulWidget
     this.clipBehavior = Clip.none,
     this.backgroundColor,
     this.materialTapTargetSize,
+    this.elevation,
+    this.shadowColor,
+    this.selectedShadowColor,
     this.avatarBorder = const CircleBorder(),
-  })  : assert(label != null),
-        assert(isEnabled != null),
-        assert(clipBehavior != null),
-        assert(pressElevation != null && pressElevation >= 0.0),
-        deleteIcon = deleteIcon ?? _kDefaultDeleteIcon,
-        super(key: key);
+  }) : assert(label != null),
+       assert(isEnabled != null),
+       assert(clipBehavior != null),
+       assert(pressElevation == null || pressElevation >= 0.0),
+       assert(elevation == null || elevation >= 0.0),
+       deleteIcon = deleteIcon ?? _kDefaultDeleteIcon,
+       super(key: key);
 
   @override
   final Widget avatar;
@@ -1272,6 +1356,12 @@ class RawChip extends StatefulWidget
   final EdgeInsetsGeometry padding;
   @override
   final MaterialTapTargetSize materialTapTargetSize;
+  @override
+  final double elevation;
+  @override
+  final Color shadowColor;
+  @override
+  final Color selectedShadowColor;
   @override
   final CircleBorder avatarBorder;
 
@@ -1510,6 +1600,10 @@ class _RawChipState extends State<RawChip> with TickerProviderStateMixin<RawChip
     );
   }
 
+  static const double _defaultElevation = 0.0;
+  static const double _defaultPressElevation = 8.0;
+  static const Color _defaultShadowColor = Colors.black;
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
@@ -1521,17 +1615,23 @@ class _RawChipState extends State<RawChip> with TickerProviderStateMixin<RawChip
     final ChipThemeData chipTheme = ChipTheme.of(context);
     final TextDirection textDirection = Directionality.of(context);
     final ShapeBorder shape = widget.shape ?? chipTheme.shape;
-
+    final double elevation = widget.elevation ?? chipTheme.elevation ?? _defaultElevation;
+    final double pressElevation = widget.pressElevation ?? chipTheme.pressElevation ?? _defaultPressElevation;
+    final Color shadowColor = widget.shadowColor ?? chipTheme.shadowColor ?? _defaultShadowColor;
+    final Color selectedShadowColor = widget.selectedShadowColor ?? chipTheme.selectedShadowColor ?? _defaultShadowColor;
+    final bool selected = widget.selected ?? false;
 
     Widget result = Material(
-      elevation: isTapping ? widget.pressElevation : 0.0,
+      elevation: isTapping ? pressElevation : elevation,
+      shadowColor: selected ? selectedShadowColor : shadowColor,
       animationDuration: pressedAnimationDuration,
       shape: shape,
       clipBehavior: widget.clipBehavior,
-      child: InkResponse(
+      child: InkWell(
         onTap: canTap ? _handleTap : null,
         onTapDown: canTap ? _handleTapDown : null,
         onTapCancel: canTap ? _handleTapCancel : null,
+        customBorder: shape,
         child: AnimatedBuilder(
           animation: Listenable.merge(<Listenable>[selectController, enableController]),
           builder: (BuildContext context, Widget child) {

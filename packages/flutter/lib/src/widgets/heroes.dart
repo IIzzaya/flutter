@@ -10,6 +10,7 @@ import 'framework.dart';
 import 'navigator.dart';
 import 'overlay.dart';
 import 'pages.dart';
+import 'routes.dart';
 import 'transitions.dart';
 
 /// Signature for a function that takes two [Rect] instances and returns a
@@ -207,11 +208,37 @@ class Hero extends StatefulWidget {
   /// Defaults to false and cannot be null.
   final bool transitionOnUserGestures;
 
-  // Returns a map of all of the heroes in context, indexed by hero tag.
-  static Map<Object, _HeroState> _allHeroesFor(BuildContext context, bool isUserGestureTransition) {
+  // Returns a map of all of the heroes in `context` indexed by hero tag that
+  // should be considered for animation when `navigator` transitions from one
+  // PageRoute to another.
+  static Map<Object, _HeroState> _allHeroesFor(
+      BuildContext context,
+      bool isUserGestureTransition,
+      NavigatorState navigator,
+  ) {
     assert(context != null);
     assert(isUserGestureTransition != null);
+    assert(navigator != null);
     final Map<Object, _HeroState> result = <Object, _HeroState>{};
+
+    void addHero(StatefulElement hero, Object tag) {
+      assert(() {
+        if (result.containsKey(tag)) {
+          throw FlutterError(
+            'There are multiple heroes that share the same tag within a subtree.\n'
+            'Within each subtree for which heroes are to be animated (i.e. a PageRoute subtree), '
+            'each Hero must have a unique non-null tag.\n'
+            'In this case, multiple heroes had the following tag: $tag\n'
+            'Here is the subtree for one of the offending heroes:\n'
+            '${hero.toStringDeep(prefixLineOne: "# ")}'
+          );
+        }
+        return true;
+      }());
+      final _HeroState heroState = hero.state;
+      result[tag] = heroState;
+    }
+
     void visitor(Element element) {
       if (element.widget is Hero) {
         final StatefulElement hero = element;
@@ -219,25 +246,24 @@ class Hero extends StatefulWidget {
         if (!isUserGestureTransition || heroWidget.transitionOnUserGestures) {
           final Object tag = heroWidget.tag;
           assert(tag != null);
-          assert(() {
-            if (result.containsKey(tag)) {
-              throw FlutterError(
-                'There are multiple heroes that share the same tag within a subtree.\n'
-                'Within each subtree for which heroes are to be animated (typically a PageRoute subtree), '
-                'each Hero must have a unique non-null tag.\n'
-                'In this case, multiple heroes had the following tag: $tag\n'
-                'Here is the subtree for one of the offending heroes:\n'
-                '${element.toStringDeep(prefixLineOne: "# ")}'
-              );
+          if (Navigator.of(hero) == navigator) {
+            addHero(hero, tag);
+          } else {
+            // The nearest navigator to the Hero is not the Navigator that is
+            // currently transitioning from one route to another. This means
+            // the Hero is inside a nested Navigator and should only be
+            // considered for animation if it is part of the top-most route in
+            // that nested Navigator and if that route is also a PageRoute.
+            final ModalRoute<dynamic> heroRoute = ModalRoute.of(hero);
+            if (heroRoute != null && heroRoute is PageRoute && heroRoute.isCurrent) {
+              addHero(hero, tag);
             }
-            return true;
-          }());
-          final _HeroState heroState = hero.state;
-          result[tag] = heroState;
+          }
         }
       }
       element.visitChildren(visitor);
     }
+
     context.visitChildElements(visitor);
     return result;
   }
@@ -275,6 +301,11 @@ class _HeroState extends State<Hero> {
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      context.ancestorWidgetOfExactType(Hero) == null,
+      'A Hero widget cannot be the descendant of another Hero widget.'
+    );
+
     if (_placeholderSize != null) {
       if (widget.placeholderBuilder == null) {
         return SizedBox(
@@ -589,7 +620,19 @@ class HeroController extends NavigatorObserver {
   void didPop(Route<dynamic> route, Route<dynamic> previousRoute) {
     assert(navigator != null);
     assert(route != null);
-    _maybeStartHeroTransition(route, previousRoute, HeroFlightDirection.pop, false);
+    // Don't trigger another flight when a pop is committed as a user gesture
+    // back swipe is snapped.
+    if (!navigator.userGestureInProgress)
+      _maybeStartHeroTransition(route, previousRoute, HeroFlightDirection.pop, false);
+  }
+
+  @override
+  void didReplace({ Route<dynamic> newRoute, Route<dynamic> oldRoute }) {
+    assert(navigator != null);
+    if (newRoute?.isCurrent == true) {
+      // Only run hero animations if the top-most route got replaced.
+      _maybeStartHeroTransition(oldRoute, newRoute, HeroFlightDirection.push, false);
+    }
   }
 
   @override
@@ -666,8 +709,8 @@ class HeroController extends NavigatorObserver {
     final Rect navigatorRect = _globalBoundingBoxFor(navigator.context);
 
     // At this point the toHeroes may have been built and laid out for the first time.
-    final Map<Object, _HeroState> fromHeroes = Hero._allHeroesFor(from.subtreeContext, isUserGestureTransition);
-    final Map<Object, _HeroState> toHeroes = Hero._allHeroesFor(to.subtreeContext, isUserGestureTransition);
+    final Map<Object, _HeroState> fromHeroes = Hero._allHeroesFor(from.subtreeContext, isUserGestureTransition, navigator);
+    final Map<Object, _HeroState> toHeroes = Hero._allHeroesFor(to.subtreeContext, isUserGestureTransition, navigator);
 
     // If the `to` route was offstage, then we're implicitly restoring its
     // animation value back to what it was before it was "moved" offstage.

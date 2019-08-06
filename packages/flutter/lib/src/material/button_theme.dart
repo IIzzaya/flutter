@@ -491,7 +491,7 @@ class ButtonThemeData extends Diagnosticable {
     if (fillColor != null)
       return fillColor;
 
-    if (button is FlatButton || button is OutlineButton)
+    if (button is FlatButton || button is OutlineButton || button.runtimeType == MaterialButton)
       return null;
 
     if (button.enabled && button is RaisedButton && _buttonColor != null)
@@ -640,7 +640,7 @@ class ButtonThemeData extends Diagnosticable {
     if (button is FlatButton)
       return 0.0;
     if (button is OutlineButton)
-      return 2.0;
+      return 0.0;
     return 8.0;
   }
 

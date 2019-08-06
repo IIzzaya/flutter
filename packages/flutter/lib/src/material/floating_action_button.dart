@@ -9,6 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'button.dart';
+import 'floating_action_button_theme.dart';
 import 'scaffold.dart';
 import 'theme.dart';
 import 'theme_data.dart';
@@ -116,10 +117,9 @@ class _DefaultHeroTag {
 class FloatingActionButton extends StatelessWidget {
   /// Creates a circular floating action button.
   ///
-  /// The [elevation], [highlightElevation], [mini], [shape], and [clipBehavior]
-  /// arguments must not be null. Additionally, [elevation],
-  /// [highlightElevation], and [disabledElevation] (if specified) must be
-  /// non-negative.
+  /// The [mini] and [clipBehavior] arguments must be non-null. Additionally,
+  /// [elevation], [highlightElevation], and [disabledElevation] (if specified)
+  /// must be non-negative.
   const FloatingActionButton({
     Key key,
     this.child,
@@ -127,27 +127,25 @@ class FloatingActionButton extends StatelessWidget {
     this.foregroundColor,
     this.backgroundColor,
     this.heroTag = const _DefaultHeroTag(),
-    this.elevation = 6.0,
-    this.highlightElevation = 12.0,
-    double disabledElevation,
+    this.elevation,
+    this.highlightElevation,
+    this.disabledElevation,
     @required this.onPressed,
     this.mini = false,
-    this.shape = const CircleBorder(),
+    this.shape,
     this.clipBehavior = Clip.none,
     this.materialTapTargetSize,
     this.isExtended = false,
-  }) :  assert(elevation != null && elevation >= 0.0),
-        assert(highlightElevation != null && highlightElevation >= 0.0),
-        assert(disabledElevation == null || disabledElevation >= 0.0),
-        assert(mini != null),
-        assert(shape != null),
-        assert(isExtended != null),
-        _sizeConstraints = mini ? _kMiniSizeConstraints : _kSizeConstraints,
-        disabledElevation = disabledElevation ?? elevation,
-        super(key: key);
+  }) : assert(elevation == null || elevation >= 0.0),
+       assert(highlightElevation == null || highlightElevation >= 0.0),
+       assert(disabledElevation == null || disabledElevation >= 0.0),
+       assert(mini != null),
+       assert(isExtended != null),
+       _sizeConstraints = mini ? _kMiniSizeConstraints : _kSizeConstraints,
+       super(key: key);
 
-  /// Creates a wider [StadiumBorder]-shaped floating action button with both
-  /// an [icon] and a [label].
+  /// Creates a wider [StadiumBorder]-shaped floating action button with
+  /// an optional [icon] and a [label].
   ///
   /// The [label] and [clipBehavior] arguments must non-null. Additionally,
   /// [elevation], [highlightElevation], and [disabledElevation] (if specified)
@@ -158,38 +156,42 @@ class FloatingActionButton extends StatelessWidget {
     this.foregroundColor,
     this.backgroundColor,
     this.heroTag = const _DefaultHeroTag(),
-    this.elevation = 6.0,
-    this.highlightElevation = 12.0,
-    double disabledElevation,
+    this.elevation,
+    this.highlightElevation,
+    this.disabledElevation,
     @required this.onPressed,
-    this.shape = const StadiumBorder(),
+    this.shape,
     this.isExtended = true,
     this.materialTapTargetSize,
     this.clipBehavior = Clip.none,
-    @required Widget icon,
+    Widget icon,
     @required Widget label,
-  }) :  assert(elevation != null && elevation >= 0.0),
-        assert(highlightElevation != null && highlightElevation >= 0.0),
-        assert(disabledElevation == null || disabledElevation >= 0.0),
-        assert(shape != null),
-        assert(isExtended != null),
-        assert(clipBehavior != null),
-        _sizeConstraints = _kExtendedSizeConstraints,
-        disabledElevation = disabledElevation ?? elevation,
-        mini = false,
-        child = _ChildOverflowBox(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const SizedBox(width: 16.0),
-              icon,
-              const SizedBox(width: 8.0),
-              label,
-              const SizedBox(width: 20.0),
-            ],
-          ),
-        ),
-        super(key: key);
+  }) : assert(elevation == null || elevation >= 0.0),
+       assert(highlightElevation == null || highlightElevation >= 0.0),
+       assert(disabledElevation == null || disabledElevation >= 0.0),
+       assert(isExtended != null),
+       assert(clipBehavior != null),
+       _sizeConstraints = _kExtendedSizeConstraints,
+       mini = false,
+       child = _ChildOverflowBox(
+         child: Row(
+           mainAxisSize: MainAxisSize.min,
+           children: icon == null
+             ? <Widget>[
+                 const SizedBox(width: 20.0),
+                 label,
+                 const SizedBox(width: 20.0),
+               ]
+             : <Widget>[
+                 const SizedBox(width: 16.0),
+                 icon,
+                 const SizedBox(width: 8.0),
+                 label,
+                 const SizedBox(width: 20.0),
+               ],
+         ),
+       ),
+       super(key: key);
 
   /// The widget below this widget in the tree.
   ///
@@ -314,10 +316,42 @@ class FloatingActionButton extends StatelessWidget {
 
   final BoxConstraints _sizeConstraints;
 
+  static const double _defaultElevation = 6;
+  static const double _defaultHighlightElevation = 12;
+  static const ShapeBorder _defaultShape = CircleBorder();
+  static const ShapeBorder _defaultExtendedShape = StadiumBorder();
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color foregroundColor = this.foregroundColor ?? theme.accentIconTheme.color;
+    final FloatingActionButtonThemeData floatingActionButtonTheme = theme.floatingActionButtonTheme;
+
+    final Color backgroundColor = this.backgroundColor
+      ?? floatingActionButtonTheme.backgroundColor
+      ?? theme.colorScheme.secondary;
+    final Color foregroundColor = this.foregroundColor
+      ?? floatingActionButtonTheme.foregroundColor
+      ?? theme.accentIconTheme.color
+      ?? theme.colorScheme.onSecondary;
+    final double elevation = this.elevation
+      ?? floatingActionButtonTheme.elevation
+      ?? _defaultElevation;
+    final double disabledElevation = this.disabledElevation
+      ?? floatingActionButtonTheme.disabledElevation
+      ?? elevation;
+    final double highlightElevation = this.highlightElevation
+      ?? floatingActionButtonTheme.highlightElevation
+      ?? _defaultHighlightElevation;
+    final MaterialTapTargetSize materialTapTargetSize = this.materialTapTargetSize
+      ?? theme.materialTapTargetSize;
+    final TextStyle textStyle = theme.accentTextTheme.button.copyWith(
+      color: foregroundColor,
+      letterSpacing: 1.2,
+    );
+    final ShapeBorder shape = this.shape
+      ?? floatingActionButtonTheme.shape
+      ?? (isExtended ? _defaultExtendedShape : _defaultShape);
+
     Widget result;
 
     if (child != null) {
@@ -335,12 +369,9 @@ class FloatingActionButton extends StatelessWidget {
       highlightElevation: highlightElevation,
       disabledElevation: disabledElevation,
       constraints: _sizeConstraints,
-      materialTapTargetSize: materialTapTargetSize ?? theme.materialTapTargetSize,
-      fillColor: backgroundColor ?? theme.accentColor,
-      textStyle: theme.accentTextTheme.button.copyWith(
-        color: foregroundColor,
-        letterSpacing: 1.2,
-      ),
+      materialTapTargetSize: materialTapTargetSize,
+      fillColor: backgroundColor,
+      textStyle: textStyle,
       shape: shape,
       clipBehavior: clipBehavior,
       child: result,

@@ -682,7 +682,7 @@ class RenderFlex extends RenderBox with ContainerRenderObjectMixin<RenderBox, Fl
               information.write('  ');
               information.writeln(node.toStringShallow(joiner: '\n  '));
             }
-            information.writeln('See also: https://flutter.io/layout/');
+            information.writeln('See also: https://flutter.dev/layout/');
             addendum = information.toString();
           } else {
             return true;
@@ -703,7 +703,7 @@ class RenderFlex extends RenderBox with ContainerRenderObjectMixin<RenderBox, Fl
             '  $debugCreator\n'
             '$addendum'
             'If this message did not help you determine the problem, consider using debugDumpRenderTree():\n'
-            '  https://flutter.io/debugging/#rendering-layer\n'
+            '  https://flutter.dev/debugging/#rendering-layer\n'
             '  http://docs.flutter.io/flutter/rendering/debugDumpRenderTree.html\n'
             'If none of the above helps enough to fix this problem, please don\'t hesitate to file a bug:\n'
             '  https://github.com/flutter/flutter/issues/new?template=BUG.md'
@@ -749,6 +749,8 @@ class RenderFlex extends RenderBox with ContainerRenderObjectMixin<RenderBox, Fl
     if (totalFlex > 0 || crossAxisAlignment == CrossAxisAlignment.baseline) {
       final double spacePerFlex = canFlex && totalFlex > 0 ? (freeSpace / totalFlex) : double.nan;
       child = firstChild;
+      double maxSizeAboveBaseline = 0;
+      double maxSizeBelowBaseline = 0;
       while (child != null) {
         final int flex = _getFlex(child);
         if (flex > 0) {
@@ -808,8 +810,18 @@ class RenderFlex extends RenderBox with ContainerRenderObjectMixin<RenderBox, Fl
             return true;
           }());
           final double distance = child.getDistanceToBaseline(textBaseline, onlyReal: true);
-          if (distance != null)
+          if (distance != null) {
             maxBaselineDistance = math.max(maxBaselineDistance, distance);
+            maxSizeAboveBaseline = math.max(
+              distance,
+              maxSizeAboveBaseline,
+            );
+            maxSizeBelowBaseline = math.max(
+              child.size.height - distance,
+              maxSizeBelowBaseline,
+            );
+            crossSize = maxSizeAboveBaseline + maxSizeBelowBaseline;
+          }
         }
         final FlexParentData childParentData = child.parentData;
         child = childParentData.nextSibling;

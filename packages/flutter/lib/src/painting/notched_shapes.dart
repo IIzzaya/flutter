@@ -1,6 +1,11 @@
+// Copyright 2019 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'dart:math' as math;
 
 import 'basic_types.dart';
+import 'borders.dart';
 
 /// A shape with a notch in its outline.
 ///
@@ -21,14 +26,18 @@ abstract class NotchedShape {
   ///
   /// The `host` is the bounding rectangle of the shape.
   ///
-  /// Rhe `guest` is the bounding rectangle of the shape for which a notch will
-  /// be made.
+  /// The `guest` is the bounding rectangle of the shape for which a notch will
+  /// be made. It is null when there is no guest.
   Path getOuterPath(Rect host, Rect guest);
 }
 
 /// A rectangle with a smooth circular notch.
-class CircularNotchedRectangle implements NotchedShape {
-  /// Creates a `CircularNotchedRectangle`.
+///
+/// See also:
+///
+///  * [CircleBorder], a [ShapeBorder] that describes a circle.
+class CircularNotchedRectangle extends NotchedShape {
+  /// Creates a [CircularNotchedRectangle].
   ///
   /// The same object can be used to create multiple shapes.
   const CircularNotchedRectangle();
@@ -47,7 +56,7 @@ class CircularNotchedRectangle implements NotchedShape {
   // TODO(amirh): add an example diagram here.
   @override
   Path getOuterPath(Rect host, Rect guest) {
-    if (!host.overlaps(guest))
+    if (guest == null || !host.overlaps(guest))
       return Path()..addRect(host);
 
     // The guest's shape is a circle bounded by the guest rectangle.
@@ -107,5 +116,49 @@ class CircularNotchedRectangle implements NotchedShape {
       ..lineTo(host.right, host.bottom)
       ..lineTo(host.left, host.bottom)
       ..close();
+  }
+}
+
+/// A [NotchedShape] created from [ShapeBorder]s.
+///
+/// Two shapes can be provided. The [host] is the shape of the widget that
+/// uses the [NotchedShape] (typically a [BottomAppBar]). The [guest] is
+/// subtracted from the [host] to create the notch (typically to make room
+/// for a [FloatingActionButton]).
+class AutomaticNotchedShape extends NotchedShape {
+  /// Creates a [NotchedShape] that is defined by two [ShapeBorder]s.
+  ///
+  /// The [host] must not be null.
+  ///
+  /// The [guest] may be null, in which case no notch is created even
+  /// if a guest rectangle is provided to [getOuterPath].
+  const AutomaticNotchedShape(this.host, [ this.guest ]);
+
+  /// The shape of the widget that uses the [NotchedShape] (typically a
+  /// [BottomAppBar]).
+  ///
+  /// This shape cannot depend on the [TextDirection], as no text direction
+  /// is available to [NotchedShape]s.
+  final ShapeBorder host;
+
+  /// The shape to subtract from the [host] to make the notch.
+  ///
+  /// This shape cannot depend on the [TextDirection], as no text direction
+  /// is available to [NotchedShape]s.
+  ///
+  /// If this is null, [getOuterPath] ignores the guest rectangle.
+  final ShapeBorder guest;
+
+  @override
+  Path getOuterPath(Rect hostRect, Rect guestRect) { // ignore: avoid_renaming_method_parameters, the
+    // parameters are renamed over the baseclass because they would clash
+    // with properties of this object, and the use of all four of them in
+    // the code below is really confusing if they have the same names.
+    final Path hostPath = host.getOuterPath(hostRect);
+    if (guest != null && guestRect != null) {
+      final Path guestPath = guest.getOuterPath(guestRect);
+      return Path.combine(PathOperation.difference, hostPath, guestPath);
+    }
+    return hostPath;
   }
 }
